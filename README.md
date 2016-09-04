@@ -1,7 +1,7 @@
 # Path Autocomplete for Visual Studio Code
 Provides path completion for visual studio code.  
 
-<img src="https://raw.githubusercontent.com/ionutvmi/path-autocomplete-vscode/master/demo/path-autocomplete.png" alt="demo gif" />
+<img src="https://raw.githubusercontent.com/ionutvmi/path-autocomplete/master/demo/path-autocomplete.gif" alt="demo gif" />
 
 ## Features
 - it supports relative paths (starting with ./)
