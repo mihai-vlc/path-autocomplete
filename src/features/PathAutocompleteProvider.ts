@@ -46,6 +46,8 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     completion.sortText = 'f';
                 }
 
+                completion.kind = vs.CompletionItemKind.File;
+
                 return completion;
             });
 
