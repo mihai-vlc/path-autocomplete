@@ -8,6 +8,7 @@ Provides path completion for visual studio code.
 - it supports absolute path to the workspace (starting with /)
 - it supports absolute path to the file system (starts with: C:)
 - it supports paths relative to the user folder (starts with ~)
+- it supports items exclusions via the `path-autocomplete.excludedItems` option.
 
 ## Installation
 You can install it from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ionutvmi.path-autocomplete).
@@ -15,6 +16,25 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 ## Options
 - `path-autocomplete.extensionOnImport` - boolean If true it will append the extension as well when inserting the file name
+- `path-autocomplete.excludedItems`  
+    This option allows you to exclude certain files from the suggestions.
+    ```
+    "path-autocomplete.excludedItems": {
+        "**/*.js": { "when": "**/*.ts" }, // ignore js files if i'm inside a ts file
+        "**/*.map": { "when": "**" }, // always ignore *.map files
+        "**/{.git,node_modules}": { "when": "**" } // always ignore .git and node_modules folders
+    }
+    ```
+    [minimatch](https://www.npmjs.com/package/minimatch) is used to check if the files match the pattern.
+
+
+## Release notes
+
+#### 1.1.0
+- Added option to exclude files
+
+#### 1.0.2
+- Initial release
 
 ## Author
 Mihai Ionut Vilcu

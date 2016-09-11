@@ -24,6 +24,10 @@ export class FileInfo {
         return this.type == 'dir';
     }
 
+    getPath() {
+        return this.itemPath;
+    }
+
     getName() {
         return this.name;
     }

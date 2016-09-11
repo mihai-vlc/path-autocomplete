@@ -1,19 +1,26 @@
 import * as vs from 'vscode';
 import {FileInfo} from './FileInfo';
+import * as minimatch from 'minimatch';
 
 // node modules
 import * as fs from 'fs';
 import * as path from 'path';
 
 const withExtension = vs.workspace.getConfiguration('path-autocomplete')['extensionOnImport'];
+const excludedItems = vs.workspace.getConfiguration('path-autocomplete')['excludedItems'];
 const homeDir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
 export class PathAutocomplete implements vs.CompletionItemProvider {
+
+    currentFile: string;
 
     provideCompletionItems(document: vs.TextDocument, position: vs.Position, token: vs.CancellationToken): Thenable<vs.CompletionItem[]> {
 
         var currentLine = document.getText(document.lineAt(position).range);
         var folderPath = this.getFolderPath(document.fileName, currentLine, position.character);
+        var self = this;
+
+        this.currentFile = document.fileName;
 
         if (!this.shouldProvide(currentLine, position.character)) {
             return Promise.resolve([]);
@@ -21,7 +28,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         return this.getFolderItems(folderPath).then(function(items: FileInfo[]) {
             // build the list of the completion items
-            var result = items.map(function(file) {
+            var result = items.filter(self.filter, self).map(function(file) {
                 var completion = new vs.CompletionItem(file.getName());
 
                 if (withExtension) {
@@ -127,5 +134,28 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         }
 
         return !!(quotes.single || quotes.double);
+    }
+
+    /**
+     * Filter for the suggested items
+     */
+    filter(file : FileInfo) {
+        // no options configured
+        if (!excludedItems || typeof excludedItems != 'object') {
+            return true;
+        }
+
+        var currenFile = this.currentFile;
+        var valid = true;
+
+        Object.keys(excludedItems).forEach(function(item) {
+            var rule = excludedItems[item].when;
+
+            if (minimatch(currenFile, rule) && minimatch(file.getPath(), item)) {
+                valid = false;
+            }
+        });
+
+        return valid;
     }
 }
