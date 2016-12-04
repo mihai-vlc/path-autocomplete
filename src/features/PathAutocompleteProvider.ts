@@ -103,6 +103,11 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return path.join(homeDir, insertedPath.substring(1));
         }
 
+        // npm package
+        if (insertedPath.match(/^[a-z]/i)) {
+            return path.join(vs.workspace.rootPath, 'node_modules', insertedPath);
+        }
+
         return path.join(currentDir, insertedPath);
     }
 
