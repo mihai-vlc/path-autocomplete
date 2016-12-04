@@ -9,6 +9,7 @@ Provides path completion for visual studio code.
 - it supports absolute path to the file system (starts with: C:)
 - it supports paths relative to the user folder (starts with ~)
 - it supports items exclusions via the `path-autocomplete.excludedItems` option.
+- it supports npm packages (starting with a-z and not relative to disk)
 
 ## Installation
 You can install it from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ionutvmi.path-autocomplete).
