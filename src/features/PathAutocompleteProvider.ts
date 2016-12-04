@@ -17,7 +17,6 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     provideCompletionItems(document: vs.TextDocument, position: vs.Position, token: vs.CancellationToken): Thenable<vs.CompletionItem[]> {
 
         var currentLine = document.getText(document.lineAt(position).range);
-        var folderPath = this.getFolderPath(document.fileName, currentLine, position.character);
         var self = this;
 
         this.currentFile = document.fileName;
@@ -25,6 +24,8 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         if (!this.shouldProvide(currentLine, position.character)) {
             return Promise.resolve([]);
         }
+
+        var folderPath = this.getFolderPath(document.fileName, currentLine, position.character);
 
         return this.getFolderItems(folderPath).then(function(items: FileInfo[]) {
             // build the list of the completion items
@@ -113,11 +114,23 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         }
 
         // npm package
-        if (insertedPath.match(/^[a-z]/i)) {
+        if (this.isNodePackage(insertedPath, currentLine)) {
             return path.join(vs.workspace.rootPath, 'node_modules', insertedPath);
         }
 
         return path.join(currentDir, insertedPath);
+    }
+
+    isNodePackage(insertedPath: string, currentLine: string) {
+        if (!currentLine.match(/require|import/)) {
+            return false;
+        }
+
+        if (!insertedPath.match(/^[a-z]/i)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
