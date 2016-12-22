@@ -95,7 +95,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         // try to build a path from the current position
         var text = currentLine.substring(0, currentPosition);
-        var startPosition = Math.max(text.lastIndexOf('"'), text.lastIndexOf("'"));
+        var startPosition = Math.max(text.lastIndexOf('"'), text.lastIndexOf("'"), text.lastIndexOf("`"));
         var insertedPath = startPosition != -1 ? text.substring(startPosition + 1) : '';
 
         // based on the project root
@@ -134,12 +134,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     }
 
     /**
-     * Deterimine if we should provide path completion.
+     * Determine if we should provide path completion.
      */
     shouldProvide(currentLine: string, position: number) {
         var quotes = {
             single: 0,
-            double: 0
+            double: 0,
+            backtick: 0
         };
 
         // check if we are inside quotes
@@ -151,9 +152,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             if (currentLine.charAt(i) == '"' && currentLine.charAt(i-1) != '\\') {
                 quotes.double += quotes.double > 0 ? -1 : 1;
             }
+
+            if (currentLine.charAt(i) == '`' && currentLine.charAt(i-1) != '\\') {
+                quotes.backtick += quotes.backtick > 0 ? -1 : 1;
+            }
         }
 
-        return !!(quotes.single || quotes.double);
+        return !!(quotes.single || quotes.double || quotes.backtick);
     }
 
     /**
