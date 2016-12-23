@@ -42,6 +42,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 // show folders before files
                 if (file.isDirectory()) {
                     completion.label += '/';
+                    completion.command = {
+                        command: 'default:type',
+                        title: 'triggerSuggest',
+                        arguments: [{
+                            text: '/'
+                        }]
+                    };
                     completion.sortText = 'd';
                 } else {
                     completion.sortText = 'f';
@@ -75,7 +82,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     try {
                         results.push(new FileInfo(path.join(folderPath, item)));
                     } catch (err) {
-                        // silenty ignore permissions errors
+                        // silently ignore permissions errors
                     }
                 });
 
