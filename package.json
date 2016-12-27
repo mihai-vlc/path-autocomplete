@@ -27,6 +27,11 @@
           "type": "boolean",
           "default": false,
           "description": "Adds the file extension to a import statements"
+        },
+        "path-autocomplete.excludedItems": {
+          "type": "object",
+          "default": {},
+          "description": "Allows you to exclude certain files from the suggestions"
         }
       }
     }
