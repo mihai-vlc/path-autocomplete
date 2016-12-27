@@ -18,7 +18,7 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 ## Options
 - `path-autocomplete.extensionOnImport` - boolean If true it will append the extension as well when inserting the file name
 - `path-autocomplete.excludedItems`  
-    This option allows you to exclude certain files from the suggestions.
+    This option allows you to exclude certain files from the suggestions.  
     ```
     "path-autocomplete.excludedItems": {
         "**/*.js": { "when": "**/*.ts" }, // ignore js files if i'm inside a ts file
@@ -26,6 +26,7 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
         "**/{.git,node_modules}": { "when": "**" } // always ignore .git and node_modules folders
     }
     ```
+    
     [minimatch](https://www.npmjs.com/package/minimatch) is used to check if the files match the pattern.
 
 
