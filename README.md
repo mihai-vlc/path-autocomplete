@@ -32,6 +32,13 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 ## Release notes
 
+#### 1.2.1
+- Fixes the extension trimming for folders. Fixes #6
+
+#### 1.2.0
+- Adds support for the trailing slash functionality. Fixes #5
+- Adds support for path autocomplete inside backticks. Fixes #3
+
 #### 1.1.0
 - Added option to exclude files
 
