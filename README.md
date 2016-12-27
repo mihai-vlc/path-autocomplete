@@ -45,6 +45,9 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 ## Release notes
 
+#### 1.3.0
+- Adds support for custom user mappings
+
 #### 1.2.1
 - Fixes the extension trimming for folders. Fixes #6
 
