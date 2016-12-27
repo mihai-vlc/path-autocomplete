@@ -8,7 +8,8 @@ import * as path from 'path';
 
 const withExtension = vs.workspace.getConfiguration('path-autocomplete')['extensionOnImport'];
 const excludedItems = vs.workspace.getConfiguration('path-autocomplete')['excludedItems'];
-const homeDir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+const pathMappings = vs.workspace.getConfiguration('path-autocomplete')['pathMappings'];
+const homeDirectory = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
 export class PathAutocomplete implements vs.CompletionItemProvider {
 
@@ -97,18 +98,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * 
      */
     getFolderPath(fileName: string, currentLine: string, currentPosition: number): string {
-        var fileInfo = path.parse(fileName);
-        var currentDir = fileInfo.dir || '/';
 
-        // try to build a path from the current position
+        // extract the inserted text from the quote to the cursor to obtain the inserted path
         var text = currentLine.substring(0, currentPosition);
         var startPosition = Math.max(text.lastIndexOf('"'), text.lastIndexOf("'"), text.lastIndexOf("`"));
-        var insertedPath = startPosition != -1 ? text.substring(startPosition + 1) : '';
-
-        // based on the project root
-        if (insertedPath.startsWith('/') && vs.workspace.rootPath) {
-            currentDir = vs.workspace.rootPath;
-        }
+        var mappingResult = this.applyMapping(startPosition != -1 ? text.substring(startPosition + 1) : '');
+        var insertedPath = mappingResult.insertedPath;
+        var currentDir = mappingResult.currentDir || this.getCurrentDirectory(fileName, insertedPath);
 
         // relative to the disk
         if (insertedPath.match(/^[a-z]:/i)) {
@@ -117,7 +113,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         // user folder
         if (insertedPath.startsWith('~')) {
-            return path.join(homeDir, insertedPath.substring(1));
+            return path.join(homeDirectory, insertedPath.substring(1));
         }
 
         // npm package
@@ -128,6 +124,59 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         return path.join(currentDir, insertedPath);
     }
 
+    /**
+     * Returns the current working directory
+     */
+    getCurrentDirectory(fileName: string, insertedPath: string): string {
+        var currentDir = path.parse(fileName).dir || '/';
+        var workspacePath = vs.workspace.rootPath;
+
+        // based on the project root
+        if (insertedPath.startsWith('/') && workspacePath) {
+            currentDir = vs.workspace.rootPath;
+        }
+
+        return path.resolve(currentDir);
+    }
+
+    /**
+     * Applies the folder mappings based on the user configurations
+     */
+    applyMapping(insertedPath: string): { currentDir: string, insertedPath: string } {
+        var currentDir = '';
+        var workspacePath = vs.workspace.rootPath;
+
+        Object.keys(pathMappings || {})
+            .map((key) => {
+                var candidatePath = pathMappings[key];
+
+                if (workspacePath) {
+                    candidatePath = candidatePath.replace('${workspace}', workspacePath);
+                }
+
+                candidatePath = candidatePath.replace('${home}', homeDirectory);
+
+                return {
+                    key: key,
+                    path: candidatePath
+                };
+            })
+            .some((mapping) => {
+                if (insertedPath.startsWith(mapping.key)) {
+                    currentDir = mapping.path;
+                    insertedPath = insertedPath.replace(mapping.key, '');
+                    return true;
+                }
+
+                return false;
+            });
+
+        return { currentDir, insertedPath };
+    }
+
+    /**
+     * Determine if the current path
+     */
     isNodePackage(insertedPath: string, currentLine: string) {
         if (!currentLine.match(/require|import/)) {
             return false;
@@ -171,19 +220,19 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     /**
      * Filter for the suggested items
      */
-    filter(file : FileInfo) {
+    filter(file: FileInfo) {
         // no options configured
         if (!excludedItems || typeof excludedItems != 'object') {
             return true;
         }
 
-        var currenFile = this.currentFile;
+        var currentFile = this.currentFile;
         var valid = true;
 
         Object.keys(excludedItems).forEach(function(item) {
             var rule = excludedItems[item].when;
 
-            if (minimatch(currenFile, rule) && minimatch(file.getPath(), item)) {
+            if (minimatch(currentFile, rule) && minimatch(file.getPath(), item)) {
                 valid = false;
             }
         });

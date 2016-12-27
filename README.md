@@ -8,8 +8,10 @@ Provides path completion for visual studio code.
 - it supports absolute path to the workspace (starting with /)
 - it supports absolute path to the file system (starts with: C:)
 - it supports paths relative to the user folder (starts with ~)
-- it supports items exclusions via the `path-autocomplete.excludedItems` option.
+- it supports items exclusions via the `path-autocomplete.excludedItems` option
 - it supports npm packages (starting with a-z and not relative to disk)
+- it supports automatic suggestion after selecting a folder
+- it supports custom mappings via the `path-autocomplete.pathMappings` option
 
 ## Installation
 You can install it from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ionutvmi.path-autocomplete).
@@ -27,7 +29,18 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
     }
     ```
     [minimatch](https://www.npmjs.com/package/minimatch) is used to check if the files match the pattern.
+- `path-autocomplete.pathMappings`  
+    Useful for defining aliases for absolute or relative paths.
+    ```
+    "path-autocomplete.pathMappings": {
+        "/test": "${workspace}/src/Actions/test", // alias for /test
+        "/": "${workspace}/src" // the root folder is now /src
+    }
+    ```
 
+    Available variables:
+    - `${workspace}` - the vscode workspace root folder
+    - `${home}` - the user home directory
 
 ## Release notes
 
