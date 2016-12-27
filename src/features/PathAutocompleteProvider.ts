@@ -32,7 +32,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             var result = items.filter(self.filter, self).map(function(file) {
                 var completion = new vs.CompletionItem(file.getName());
 
-                if (withExtension) {
+                if (withExtension || file.isDirectory()) {
                     completion.insertText = path.basename(file.getName());
                 } else {
                     // remove the extension
