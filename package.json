@@ -2,7 +2,7 @@
   "name": "path-autocomplete",
   "displayName": "Path Autocomplete",
   "description": "Provides path completion for visual studio code.",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "publisher": "ionutvmi",
   "repository": {
     "type": "git",
@@ -37,6 +37,11 @@
           "type": "object",
           "default": {},
           "description": "Defines custom mappings for the autocomplete paths."
+        },
+        "path-autocomplete.transformations": {
+          "type": "array",
+          "default": [],
+          "description": "Custom transformations applied to the inserted text."
         }
       }
     }

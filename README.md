@@ -12,6 +12,7 @@ Provides path completion for visual studio code.
 - it supports npm packages (starting with a-z and not relative to disk)
 - it supports automatic suggestion after selecting a folder
 - it supports custom mappings via the `path-autocomplete.pathMappings` option
+- it supports custom transformations to the inserted text via the `path-autocomplete.transformations`
 
 ## Installation
 You can install it from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ionutvmi.path-autocomplete).
@@ -42,8 +43,29 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
     Available variables:
     - `${workspace}` - the vscode workspace root folder
     - `${home}` - the user home directory
+- `path-autocomplete.transformations`
+    List of custom transformation applied to the inserted text.  
+    Example: replace `_` with an empty string when selecting a SCSS partial file. 
+    ```
+    "path-autocomplete.transformations": [{
+        "type": "replace",
+        "parameters": ["^_", ""],
+        "when": {
+            "fileName": "\\.scss$"
+        }
+    }],
+    ```
+
+    Supported transformation:
+
+    | Transformation type | Description |
+    | ------------------- | ----------- |
+    | replace | Performs a string replace on the selected item text. <br/> Parameters: <ul><li> `regex` - a regex pattern</li><li>`replaceString` - The replacement string.</li></ul> |
 
 ## Release notes
+
+#### 1.4.0
+- Adds support for custom transformation
 
 #### 1.3.0
 - Adds support for custom user mappings

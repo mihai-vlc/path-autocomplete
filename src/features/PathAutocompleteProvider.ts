@@ -9,6 +9,7 @@ import * as path from 'path';
 const withExtension = vs.workspace.getConfiguration('path-autocomplete')['extensionOnImport'];
 const excludedItems = vs.workspace.getConfiguration('path-autocomplete')['excludedItems'];
 const pathMappings = vs.workspace.getConfiguration('path-autocomplete')['pathMappings'];
+const transformations = vs.workspace.getConfiguration('path-autocomplete')['transformations'];
 const homeDirectory = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
 export class PathAutocomplete implements vs.CompletionItemProvider {
@@ -28,17 +29,12 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         var folderPath = this.getFolderPath(document.fileName, currentLine, position.character);
 
-        return this.getFolderItems(folderPath).then(function(items: FileInfo[]) {
+        return this.getFolderItems(folderPath).then((items: FileInfo[]) => {
             // build the list of the completion items
-            var result = items.filter(self.filter, self).map(function(file) {
+            var result = items.filter(self.filter, self).map((file) => {
                 var completion = new vs.CompletionItem(file.getName());
 
-                if (withExtension || file.isDirectory()) {
-                    completion.insertText = path.basename(file.getName());
-                } else {
-                    // remove the extension
-                    completion.insertText = path.basename(file.getName(), path.extname(file.getName()));
-                }
+                completion.insertText = this.getInsertText(file);
 
                 // show folders before files
                 if (file.isDirectory()) {
@@ -65,6 +61,33 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
             return Promise.resolve(result);
         });
+    }
+
+
+    getInsertText(file: FileInfo): string {
+        var insertText = '';
+        if (withExtension || file.isDirectory()) {
+            insertText = path.basename(file.getName());
+        } else {
+            // remove the extension
+            insertText = path.basename(file.getName(), path.extname(file.getName()));
+        }
+
+        // apply the transformations
+        transformations.forEach((transform) => {
+            var fileNameRegex = transform.when && transform.when.fileName && new RegExp(transform.when.fileName);
+            if (fileNameRegex && !file.getName().match(fileNameRegex)) {
+                return;
+            }
+
+            var parameters = transform.parameters || [];
+            if (transform.type == 'replace' && parameters[0]) {
+                insertText = String.prototype.replace.call(insertText, new RegExp(parameters[0]), parameters[1]);
+            }
+
+        });
+
+        return insertText;
     }
 
 
