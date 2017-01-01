@@ -57,10 +57,10 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
     ```
 
     Supported transformation:
-
-    | Transformation type | Description |
-    | ------------------- | ----------- |
-    | replace | Performs a string replace on the selected item text. <br/> Parameters: <ul><li> `regex` - a regex pattern</li><li>`replaceString` - The replacement string.</li></ul> |
+    - `replace` - Performs a string replace on the selected item text.  
+        Parameters:  
+        - `regex` - a regex pattern
+        - `replaceString` - the replacement string
 
 ## Release notes
 

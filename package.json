@@ -2,8 +2,9 @@
   "name": "path-autocomplete",
   "displayName": "Path Autocomplete",
   "description": "Provides path completion for visual studio code.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "publisher": "ionutvmi",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/ionutvmi/path-autocomplete"
