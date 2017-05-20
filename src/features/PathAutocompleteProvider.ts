@@ -10,6 +10,7 @@ const withExtension = vs.workspace.getConfiguration('path-autocomplete')['extens
 const excludedItems = vs.workspace.getConfiguration('path-autocomplete')['excludedItems'];
 const pathMappings = vs.workspace.getConfiguration('path-autocomplete')['pathMappings'];
 const transformations = vs.workspace.getConfiguration('path-autocomplete')['transformations'];
+const triggerOutsideStrings = vs.workspace.getConfiguration('path-autocomplete')['triggerOutsideStrings'];
 const homeDirectory = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
 export class PathAutocomplete implements vs.CompletionItemProvider {
@@ -122,10 +123,8 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      */
     getFolderPath(fileName: string, currentLine: string, currentPosition: number): string {
 
-        // extract the inserted text from the quote to the cursor to obtain the inserted path
-        var text = currentLine.substring(0, currentPosition);
-        var startPosition = Math.max(text.lastIndexOf('"'), text.lastIndexOf("'"), text.lastIndexOf("`"));
-        var mappingResult = this.applyMapping(startPosition != -1 ? text.substring(startPosition + 1) : '');
+        var insertedPath = this.getInsertedPath(currentLine, currentPosition);
+        var mappingResult = this.applyMapping(insertedPath);
         var insertedPath = mappingResult.insertedPath;
         var currentDir = mappingResult.currentDir || this.getCurrentDirectory(fileName, insertedPath);
 
@@ -145,6 +144,52 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         }
 
         return path.join(currentDir, insertedPath);
+    }
+
+    getInsertedPath(currentLine: string, currentPosition: number): string {
+        var lastQuote = -1;
+        var insideSingleQuote = false;
+        var insideDoubleQuote = false;
+        var insideBacktickQuote = false;
+
+        var lastWhiteSpace = -1;
+
+        for (var i = 0; i < currentPosition; i++) {
+            var c = currentLine[i];
+
+            // skip next character if escaped
+            if (c == "\\") {
+                i++;
+                continue;
+            }
+
+            // handle space
+            if (c == " " || c == "\t") {
+                lastWhiteSpace = i;
+                continue;
+            }
+
+            // handle quotes
+            if (c == "'") {
+                insideSingleQuote = !insideSingleQuote;
+                lastQuote = i;
+            } else if (c == '"') {
+                insideDoubleQuote = !insideDoubleQuote;
+                lastQuote = i;
+            } else if (c == "`") {
+                insideBacktickQuote = !insideBacktickQuote;
+                lastQuote = i;
+            }
+        }
+
+        var pathBegin;
+        if (insideSingleQuote || insideDoubleQuote || insideBacktickQuote) {
+            pathBegin = lastQuote + 1;
+        } else {
+            pathBegin = lastWhiteSpace + 1;
+        }
+
+        return currentLine.substring(pathBegin, currentPosition);
     }
 
     /**
@@ -216,6 +261,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Determine if we should provide path completion.
      */
     shouldProvide(currentLine: string, position: number) {
+        if (triggerOutsideStrings) {
+            return true;
+        }
+
         var quotes = {
             single: 0,
             double: 0,
