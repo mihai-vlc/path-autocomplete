@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import {PathAutocomplete} from './features/PathAutoCompleteProvider';
+import {PathAutocomplete} from './features/PathAutocompleteProvider';
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider('*', new PathAutocomplete(), '/'));
