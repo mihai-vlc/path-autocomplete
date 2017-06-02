@@ -122,8 +122,8 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      */
     getFolderPath(fileName: string, currentLine: string, currentPosition: number): string {
 
-        var insertedPath = this.getInsertedPath(currentLine, currentPosition);
-        var mappingResult = this.applyMapping(insertedPath);
+        var userPath = this.getUserPath(currentLine, currentPosition);
+        var mappingResult = this.applyMapping(userPath);
         var insertedPath = mappingResult.insertedPath;
         var currentDir = mappingResult.currentDir || this.getCurrentDirectory(fileName, insertedPath);
 
@@ -145,12 +145,14 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         return path.join(currentDir, insertedPath);
     }
 
-    getInsertedPath(currentLine: string, currentPosition: number): string {
+    /**
+     * Retrieves the path inserted by the user. This is taken based on the last quote or last white space character.
+     * 
+     * @param currentLine The current line of the cursor.
+     * @param currentPosition The current position of the cursor.
+     */
+    getUserPath(currentLine: string, currentPosition: number): string {
         var lastQuote = -1;
-        var insideSingleQuote = false;
-        var insideDoubleQuote = false;
-        var insideBacktickQuote = false;
-
         var lastWhiteSpace = -1;
 
         for (var i = 0; i < currentPosition; i++) {
@@ -169,26 +171,14 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             }
 
             // handle quotes
-            if (c == "'") {
-                insideSingleQuote = !insideSingleQuote;
-                lastQuote = i;
-            } else if (c == '"') {
-                insideDoubleQuote = !insideDoubleQuote;
-                lastQuote = i;
-            } else if (c == "`") {
-                insideBacktickQuote = !insideBacktickQuote;
+            if (c == "'" || c == '"' || c == "`") {
                 lastQuote = i;
             }
         }
 
-        var pathBegin;
-        if (insideSingleQuote || insideDoubleQuote || insideBacktickQuote) {
-            pathBegin = lastQuote + 1;
-        } else {
-            pathBegin = lastWhiteSpace + 1;
-        }
+        var startPosition = (lastQuote != -1) ? lastQuote : lastWhiteSpace;
 
-        return currentLine.substring(pathBegin, currentPosition);
+        return currentLine.substring(startPosition + 1, currentPosition);
     }
 
     /**
