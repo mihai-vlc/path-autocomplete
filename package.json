@@ -43,6 +43,11 @@
           "type": "array",
           "default": [],
           "description": "Custom transformations applied to the inserted text."
+        },
+        "path-autocomplete.triggerOutsideStrings": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enables path autocompletion outside strings."
         }
       }
     }
