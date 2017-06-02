@@ -17,7 +17,6 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     currentFile: string;
 
     provideCompletionItems(document: vs.TextDocument, position: vs.Position, token: vs.CancellationToken): Thenable<vs.CompletionItem[]> {
-
         var currentLine = document.getText(document.lineAt(position).range);
         var self = this;
 
@@ -141,10 +140,31 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         // npm package
         if (this.isNodePackage(insertedPath, currentLine)) {
-            return path.join(vs.workspace.rootPath, 'node_modules', insertedPath);
+            return path.join(this.getNodeModulesPath(currentDir), insertedPath);
         }
 
         return path.join(currentDir, insertedPath);
+    }
+
+    /**
+     * Searches for the node_modules folder in the parent folders of the current directory.
+     *
+     * @param currentDir The current directory
+     */
+    getNodeModulesPath(currentDir: string): string {
+        var rootPath = vs.workspace.rootPath;
+
+        while (currentDir != path.dirname(currentDir)) {
+            console.log(currentDir);
+            var candidatePath = path.join(currentDir, 'node_modules');
+            if (fs.existsSync(candidatePath)) {
+                return candidatePath;
+            }
+
+            currentDir = path.dirname(currentDir);
+        }
+
+        return path.join(rootPath, 'node_modules');
     }
 
     /**
