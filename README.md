@@ -64,6 +64,11 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 ## Release notes
 
+#### 1.5.0
+- Adds support for path autocomplete outside strings. 
+    Available via `path-autocomplete.triggerOutsideStrings`
+- Improves the support for node_modules lookup. #15
+
 #### 1.4.0
 - Adds support for custom transformation
 
