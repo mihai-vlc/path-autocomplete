@@ -61,6 +61,7 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
         Parameters:  
         - `regex` - a regex pattern
         - `replaceString` - the replacement string
+- `path-autocomplete.triggerOutsideStrings` boolean - if true it will trigger the autocomplete outside of quotes
 
 ## Release notes
 
