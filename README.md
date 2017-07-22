@@ -62,8 +62,12 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
         - `regex` - a regex pattern
         - `replaceString` - the replacement string
 - `path-autocomplete.triggerOutsideStrings` boolean - if true it will trigger the autocomplete outside of quotes
+- `path-autocomplete.enableFolderTrailingSlash` boolean - if true it will add a slash after the insertion of a folder path that will trigger the autocompletion.
 
 ## Release notes
+
+#### 1.6.0
+- Adds the `path-autocomplete.enableFolderTrailingSlash` option
 
 #### 1.5.0
 - Adds support for path autocomplete outside strings. 

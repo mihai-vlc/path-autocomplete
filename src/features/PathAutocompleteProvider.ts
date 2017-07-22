@@ -6,12 +6,30 @@ import * as minimatch from 'minimatch';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const withExtension = vs.workspace.getConfiguration('path-autocomplete')['extensionOnImport'];
-const excludedItems = vs.workspace.getConfiguration('path-autocomplete')['excludedItems'];
-const pathMappings = vs.workspace.getConfiguration('path-autocomplete')['pathMappings'];
-const transformations = vs.workspace.getConfiguration('path-autocomplete')['transformations'];
-const triggerOutsideStrings = vs.workspace.getConfiguration('path-autocomplete')['triggerOutsideStrings'];
-const homeDirectory = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+var config = {
+    withExtension: null,
+    excludedItems: null,
+    pathMappings: null,
+    transformations: null,
+    triggerOutsideStrings: null,
+    enableFolderTrailingSlash: null,
+    homeDirectory: null
+};
+
+function loadConfigurations() {
+    console.log("PathAutoComplete: Updating configurations");
+
+    config.withExtension = vs.workspace.getConfiguration('path-autocomplete')['extensionOnImport'];
+    config.excludedItems = vs.workspace.getConfiguration('path-autocomplete')['excludedItems'];
+    config.pathMappings = vs.workspace.getConfiguration('path-autocomplete')['pathMappings'];
+    config.transformations = vs.workspace.getConfiguration('path-autocomplete')['transformations'];
+    config.triggerOutsideStrings = vs.workspace.getConfiguration('path-autocomplete')['triggerOutsideStrings'];
+    config.enableFolderTrailingSlash = vs.workspace.getConfiguration('path-autocomplete')['enableFolderTrailingSlash'];
+    config.homeDirectory = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+}
+
+vs.workspace.onDidChangeConfiguration(loadConfigurations);
+loadConfigurations();
 
 export class PathAutocomplete implements vs.CompletionItemProvider {
 
@@ -39,13 +57,17 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 // show folders before files
                 if (file.isDirectory()) {
                     completion.label += '/';
-                    completion.command = {
-                        command: 'default:type',
-                        title: 'triggerSuggest',
-                        arguments: [{
-                            text: '/'
-                        }]
-                    };
+
+                    if (config.enableFolderTrailingSlash) {
+                        completion.command = {
+                            command: 'default:type',
+                            title: 'triggerSuggest',
+                            arguments: [{
+                                text: '/'
+                            }]
+                        };
+                    }
+
                     completion.sortText = 'd';
                 } else {
                     completion.sortText = 'f';
@@ -66,7 +88,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
     getInsertText(file: FileInfo): string {
         var insertText = '';
-        if (withExtension || file.isDirectory()) {
+        if (config.withExtension || file.isDirectory()) {
             insertText = path.basename(file.getName());
         } else {
             // remove the extension
@@ -74,7 +96,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         }
 
         // apply the transformations
-        transformations.forEach((transform) => {
+        config.transformations.forEach((transform) => {
             var fileNameRegex = transform.when && transform.when.fileName && new RegExp(transform.when.fileName);
             if (fileNameRegex && !file.getName().match(fileNameRegex)) {
                 return;
@@ -134,7 +156,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         // user folder
         if (insertedPath.startsWith('~')) {
-            return path.join(homeDirectory, insertedPath.substring(1));
+            return path.join(config.homeDirectory, insertedPath.substring(1));
         }
 
         // npm package
@@ -224,15 +246,15 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         var currentDir = '';
         var workspacePath = vs.workspace.rootPath;
 
-        Object.keys(pathMappings || {})
+        Object.keys(config.pathMappings || {})
             .map((key) => {
-                var candidatePath = pathMappings[key];
+                var candidatePath = config.pathMappings[key];
 
                 if (workspacePath) {
                     candidatePath = candidatePath.replace('${workspace}', workspacePath);
                 }
 
-                candidatePath = candidatePath.replace('${home}', homeDirectory);
+                candidatePath = candidatePath.replace('${home}', config.homeDirectory);
 
                 return {
                     key: key,
@@ -271,7 +293,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Determine if we should provide path completion.
      */
     shouldProvide(currentLine: string, position: number) {
-        if (triggerOutsideStrings) {
+        if (config.triggerOutsideStrings) {
             return true;
         }
 
@@ -304,15 +326,15 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      */
     filter(file: FileInfo) {
         // no options configured
-        if (!excludedItems || typeof excludedItems != 'object') {
+        if (!config.excludedItems || typeof config.excludedItems != 'object') {
             return true;
         }
 
         var currentFile = this.currentFile;
         var valid = true;
 
-        Object.keys(excludedItems).forEach(function(item) {
-            var rule = excludedItems[item].when;
+        Object.keys(config.excludedItems).forEach(function(item) {
+            var rule = config.excludedItems[item].when;
 
             if (minimatch(currentFile, rule) && minimatch(file.getPath(), item)) {
                 valid = false;

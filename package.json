@@ -48,6 +48,11 @@
           "type": "boolean",
           "default": false,
           "description": "Enables path autocompletion outside strings."
+        },
+        "path-autocomplete.enableFolderTrailingSlash": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables the trailing slash on the folder path insertion."
         }
       }
     }
