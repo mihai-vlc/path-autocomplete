@@ -47,6 +47,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         var folderPath = this.getFolderPath(document.fileName, currentLine, position.character);
 
+        if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
+            return Promise.resolve([]);
+        }
+
         return this.getFolderItems(folderPath).then((items: FileInfo[]) => {
             // build the list of the completion items
             var result = items.filter(self.filter, self).map((file) => {
