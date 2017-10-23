@@ -17,7 +17,6 @@ var config = {
 };
 
 function loadConfigurations() {
-    console.log("PathAutoComplete: Updating configurations");
 
     config.withExtension = vs.workspace.getConfiguration('path-autocomplete')['extensionOnImport'];
     config.excludedItems = vs.workspace.getConfiguration('path-autocomplete')['excludedItems'];
