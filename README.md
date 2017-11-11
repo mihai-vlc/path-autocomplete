@@ -65,6 +65,13 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 - `path-autocomplete.triggerOutsideStrings` boolean - if true it will trigger the autocomplete outside of quotes
 - `path-autocomplete.enableFolderTrailingSlash` boolean - if true it will add a slash after the insertion of a folder path that will trigger the autocompletion.
 
+## Tips
+
+- `./` for relative paths
+
+    If `./` doesn't work properly, add this to `keybindings.json`: `{ "key": ".", "command": "" }`. Refer to https://github.com/ChristianKohler/PathIntellisense/issues/9
+
+
 ## Release notes
 
 #### 1.7.0
