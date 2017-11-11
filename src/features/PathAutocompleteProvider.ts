@@ -265,7 +265,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 };
             })
             .some((mapping) => {
-                if (insertedPath.startsWith(mapping.key)) {
+                if (insertedPath.startsWith(mapping.key) || mapping.key === '$root') {
                     currentDir = mapping.path;
                     insertedPath = insertedPath.replace(mapping.key, '');
                     return true;

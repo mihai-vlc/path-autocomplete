@@ -36,7 +36,8 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
     ```
     "path-autocomplete.pathMappings": {
         "/test": "${workspace}/src/Actions/test", // alias for /test
-        "/": "${workspace}/src" // the root folder is now /src
+        "/": "${workspace}/src", // the absolute root folder is now /src,
+        "$root": ${workspace}/src // the relative root folder is now /src
     }
     ```
 
@@ -65,6 +66,10 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 - `path-autocomplete.enableFolderTrailingSlash` boolean - if true it will add a slash after the insertion of a folder path that will trigger the autocompletion.
 
 ## Release notes
+
+#### 1.7.0
+- Adds support for redefining the root folder via the pathMappings with the `$root`
+special key.
 
 #### 1.6.0
 - Adds the `path-autocomplete.enableFolderTrailingSlash` option
