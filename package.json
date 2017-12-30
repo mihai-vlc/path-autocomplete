@@ -2,7 +2,7 @@
   "name": "path-autocomplete",
   "displayName": "Path Autocomplete",
   "description": "Provides path completion for visual studio code.",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "publisher": "ionutvmi",
   "icon": "icon.png",
   "repository": {
@@ -14,8 +14,9 @@
     "email": "ionutvmi@gmail.com"
   },
   "engines": {
-    "vscode": "^1.5.0"
+    "vscode": "^1.19.0"
   },
+  "keywords": ["multi-root ready"],
   "categories": [
     "Other"
   ],
@@ -27,32 +28,38 @@
         "path-autocomplete.extensionOnImport": {
           "type": "boolean",
           "default": false,
-          "description": "Adds the file extension to a import statements"
+          "description": "Adds the file extension to a import statements",
+          "scope": "resource"
         },
         "path-autocomplete.excludedItems": {
           "type": "object",
           "default": {},
-          "description": "Allows you to exclude certain files from the suggestions"
+          "description": "Allows you to exclude certain files from the suggestions",
+          "scope": "resource"
         },
         "path-autocomplete.pathMappings": {
           "type": "object",
           "default": {},
-          "description": "Defines custom mappings for the autocomplete paths."
+          "description": "Defines custom mappings for the autocomplete paths.",
+          "scope": "resource"
         },
         "path-autocomplete.transformations": {
           "type": "array",
           "default": [],
-          "description": "Custom transformations applied to the inserted text."
+          "description": "Custom transformations applied to the inserted text.",
+          "scope": "resource"
         },
         "path-autocomplete.triggerOutsideStrings": {
           "type": "boolean",
           "default": false,
-          "description": "Enables path autocompletion outside strings."
+          "description": "Enables path autocompletion outside strings.",
+          "scope": "resource"
         },
         "path-autocomplete.enableFolderTrailingSlash": {
           "type": "boolean",
           "default": true,
-          "description": "Enables the trailing slash on the folder path insertion."
+          "description": "Enables the trailing slash on the folder path insertion.",
+          "scope": "resource"
         }
       }
     }
@@ -62,17 +69,18 @@
   ],
   "main": "./out/src/extension",
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
-    "compile": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test"
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
-    "@types/mocha": "2.2.41",
-    "@types/node": "8.0.24",
-    "mocha": "3.5.0",
-    "typescript": "2.4.2",
-    "vscode": "1.1.4"
+    "typescript": "^2.6.1",
+    "vscode": "^1.1.6",
+    "@types/node": "^7.0.43",
+    "@types/mocha": "^2.2.42",
+    "mocha": "3.5.0"
   },
   "dependencies": {
     "minimatch": "3.0.3"

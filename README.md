@@ -35,14 +35,15 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
     Useful for defining aliases for absolute or relative paths.
     ```
     "path-autocomplete.pathMappings": {
-        "/test": "${workspace}/src/Actions/test", // alias for /test
-        "/": "${workspace}/src", // the absolute root folder is now /src,
-        "$root": ${workspace}/src // the relative root folder is now /src
+        "/test": "${folder}/src/Actions/test", // alias for /test
+        "/": "${folder}/src", // the absolute root folder is now /src,
+        "$root": ${folder}/src // the relative root folder is now /src
     }
     ```
 
     Available variables:
-    - `${workspace}` - the vscode workspace root folder
+    - `${workspace}` - the path of the main folder of the workspace (usually first one in the list)
+    - `${folder}` - the path of the vscode top folder for the current file
     - `${home}` - the user home directory
 - `path-autocomplete.transformations`
     List of custom transformation applied to the inserted text.  
@@ -73,6 +74,9 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 
 ## Release notes
+
+#### 1.8.0
+- Added support for multi root vscode folders via the `${folder}` variable in pathMappings
 
 #### 1.7.0
 - Adds support for redefining the root folder via the pathMappings with the `$root`
