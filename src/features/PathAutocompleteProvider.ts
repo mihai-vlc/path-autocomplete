@@ -23,7 +23,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         configuration.update(document.uri);
 
         this.currentFile = document.fileName;
-
+ 
         if (!this.shouldProvide(currentLine, position.character)) {
             return Promise.resolve([]);
         }
@@ -71,7 +71,6 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return Promise.resolve(result);
         });
     }
-
 
     getInsertText(file: FileInfo): string {
         var insertText = '';
@@ -162,7 +161,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      */
     getUserPath(currentLine: string, currentPosition: number): string {
         var lastQuote = -1;
-        var lastWhiteSpace = -1;
+        var lastSeparator = -1;
 
         for (var i = 0; i < currentPosition; i++) {
             var c = currentLine[i];
@@ -173,9 +172,9 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 continue;
             }
 
-            // handle space
-            if (c == " " || c == "\t") {
-                lastWhiteSpace = i;
+            // handle space, tabs and ( for support outside strings
+            if (c == " " || c == "\t" || c == '(') {
+                lastSeparator = i;
                 continue;
             }
 
@@ -185,7 +184,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             }
         }
 
-        var startPosition = (lastQuote != -1) ? lastQuote : lastWhiteSpace;
+        var startPosition = (lastQuote != -1) ? lastQuote : lastSeparator;
 
         return currentLine.substring(startPosition + 1, currentPosition);
     }

@@ -75,6 +75,9 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 ## Release notes
 
+#### 1.8.1
+- Fixes the handing of the path outside strings for markdown links `[](./)`
+
 #### 1.8.0
 - Added support for multi root vscode folders via the `${folder}` variable in pathMappings
 
