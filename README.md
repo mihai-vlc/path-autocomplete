@@ -67,6 +67,7 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 - `path-autocomplete.enableFolderTrailingSlash` boolean - if true it will add a slash after the insertion of a folder path that will trigger the autocompletion.
 
 ## Tips
+- if you want to use this in markdown or simple text files you need to enable `path-autocomplete.triggerOutsideStrings`
 
 - `./` for relative paths
 
