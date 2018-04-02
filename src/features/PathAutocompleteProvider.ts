@@ -23,7 +23,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         configuration.update(document.uri);
 
         this.currentFile = document.fileName;
- 
+
         if (!this.shouldProvide(currentLine, position.character)) {
             return Promise.resolve([]);
         }
@@ -126,7 +126,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     /**
      * Builds the current folder path based on the current file and the path from
      * the current line.
-     * 
+     *
      */
     getFolderPath(fileName: string, currentLine: string, currentPosition: number): string {
 
@@ -155,7 +155,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
     /**
      * Retrieves the path inserted by the user. This is taken based on the last quote or last white space character.
-     * 
+     *
      * @param currentLine The current line of the cursor.
      * @param currentPosition The current position of the cursor.
      */

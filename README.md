@@ -76,6 +76,9 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 ## Release notes
 
+#### 1.9.0
+- Adds `{` and `[` as separators for the current path
+
 #### 1.8.1
 - Fixes the handing of the path outside strings for markdown links `[](./)`
 
