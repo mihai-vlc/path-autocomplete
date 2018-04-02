@@ -173,7 +173,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             }
 
             // handle space, tabs and ( for support outside strings
-            if (c == " " || c == "\t" || c == '(') {
+            if (c == " " || c == "\t" || c == '(' || c == '{' || c == '[') {
                 lastSeparator = i;
                 continue;
             }
