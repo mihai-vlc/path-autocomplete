@@ -30,13 +30,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return Promise.resolve([]);
         }
 
-        var folderPath = this.getFolderPath(document.fileName, currentLine, position.character);
+        var foldersPath = this.getFoldersPath(document.fileName, currentLine, position.character);
 
-        if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
+        if (foldersPath.length == 0) {
             return Promise.resolve([]);
         }
 
-        return this.getFolderItems(folderPath).then((items: FileInfo[]) => {
+        return this.getFolderItems(foldersPath).then((items: FileInfo[]) => {
             // build the list of the completion items
             var result = items.filter(self.filter, self).map((file) => {
                 var completion = new vs.CompletionItem(file.getName());
@@ -114,24 +114,32 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     /**
      * Builds a list of the available files and folders from the provided path.
      */
-    getFolderItems(folderPath: string) {
-        return new Promise(function(resolve, reject) {
-            fs.readdir(folderPath, function(err, items) {
-                if (err) {
-                    return reject(err);
-                }
-                var results = [];
-
-                items.forEach(item => {
-                    try {
-                        results.push(new FileInfo(path.join(folderPath, item)));
-                    } catch (err) {
-                        // silently ignore permissions errors
+    getFolderItems(foldersPath: string[]) {
+        var results = foldersPath.map(folderPath => {
+            return new Promise(function(resolve, reject) {
+                fs.readdir(folderPath, function(err, items) {
+                    if (err) {
+                        return reject(err);
                     }
-                });
+                    var results = [];
 
-                resolve(results);
+                    items.forEach(item => {
+                        try {
+                            results.push(new FileInfo(path.join(folderPath, item)));
+                        } catch (err) {
+                            // silently ignore permissions errors
+                        }
+                    });
+
+                    resolve(results);
+                });
             });
+        });
+
+        return Promise.all(results).then(results => {
+            return results.reduce((all: string[], currentResults: string[]) => {
+                return all.concat(currentResults);
+            }, []);
         });
     }
 
@@ -140,29 +148,40 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * the current line.
      *
      */
-    getFolderPath(fileName: string, currentLine: string, currentPosition: number): string {
+    getFoldersPath(fileName: string, currentLine: string, currentPosition: number): string[] {
 
         var userPath = this.getUserPath(currentLine, currentPosition);
         var mappingResult = this.applyMapping(userPath);
-        var insertedPath = mappingResult.insertedPath;
-        var currentDir = mappingResult.currentDir || this.getCurrentDirectory(fileName, insertedPath);
+        
+        return mappingResult.items.map((item) => {
+            var insertedPath = item.insertedPath;
+            var currentDir = item.currentDir || this.getCurrentDirectory(fileName, insertedPath);
+            
+            // relative to the disk
+            if (insertedPath.match(/^[a-z]:/i)) {
+                return path.resolve(insertedPath);
+            }
 
-        // relative to the disk
-        if (insertedPath.match(/^[a-z]:/i)) {
-            return path.resolve(insertedPath);
-        }
+            // user folder
+            if (insertedPath.startsWith('~')) {
+                return path.join(configuration.data.homeDirectory, insertedPath.substring(1));
+            }
 
-        // user folder
-        if (insertedPath.startsWith('~')) {
-            return path.join(configuration.data.homeDirectory, insertedPath.substring(1));
-        }
+            // npm package
+            if (this.isNodePackage(insertedPath, currentLine)) {
+                return path.join(this.getNodeModulesPath(currentDir), insertedPath);
+            }
 
-        // npm package
-        if (this.isNodePackage(insertedPath, currentLine)) {
-            return path.join(this.getNodeModulesPath(currentDir), insertedPath);
-        }
+            return path.join(currentDir, insertedPath);
+        })
+        // keep only valid paths
+        .filter(folderPath => {
+            if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
+                return false;
+            }
 
-        return path.join(currentDir, insertedPath);
+            return true;
+        });
     }
 
     /**
@@ -240,41 +259,62 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     /**
      * Applies the folder mappings based on the user configurations
      */
-    applyMapping(insertedPath: string): { currentDir: string, insertedPath: string } {
+    applyMapping(insertedPath: string): { items } {
         var currentDir = '';
         var workspaceFolderPath = configuration.data.workspaceFolderPath;
         var workspaceRootPath = configuration.data.workspaceRootPath;
+        var items = [];
 
         Object.keys(configuration.data.pathMappings || {})
             .map((key) => {
-                var candidatePath = configuration.data.pathMappings[key];
+                var candidatePaths = configuration.data.pathMappings[key];
 
-                if (workspaceRootPath) {
-                    candidatePath = candidatePath.replace('${workspace}', workspaceRootPath);
+                if (typeof candidatePaths == 'string') {
+                    candidatePaths = [candidatePaths];
                 }
 
-                if (workspaceFolderPath) {
-                    candidatePath = candidatePath.replace('${folder}', workspaceFolderPath);
-                }
-
-                candidatePath = candidatePath.replace('${home}', configuration.data.homeDirectory);
-
-                return {
-                    key: key,
-                    path: candidatePath
-                };
+                return candidatePaths.map(candidatePath => {
+                    if (workspaceRootPath) {
+                        candidatePath = candidatePath.replace('${workspace}', workspaceRootPath);
+                    }
+    
+                    if (workspaceFolderPath) {
+                        candidatePath = candidatePath.replace('${folder}', workspaceFolderPath);
+                    }
+    
+                    candidatePath = candidatePath.replace('${home}', configuration.data.homeDirectory);
+    
+                    return {
+                        key: key,
+                        path: candidatePath
+                    };
+                });
             })
-            .some((mapping) => {
-                if (insertedPath.startsWith(mapping.key) || mapping.key === '$root') {
-                    currentDir = mapping.path;
-                    insertedPath = insertedPath.replace(mapping.key, '');
-                    return true;
-                }
+            .some((mappings) => {
+                var found = false;
 
-                return false;
+                mappings.forEach(mapping => {
+                    if (insertedPath.startsWith(mapping.key) || (mapping.key === '$root' && !insertedPath.startsWith('.'))) {
+                        items.push({
+                            currentDir: mapping.path,
+                            insertedPath: insertedPath.replace(mapping.key, '')
+                        });
+                        found = true;
+                    }
+                });
+
+                // stop after the first mapping found
+                return found;
             });
-
-        return { currentDir, insertedPath };
+        
+        // no mapping was found, use the raw path inserted by the user
+        if (items.length === 0) {
+            items.push({
+                currentDir: '',
+                insertedPath
+            });
+        }
+        return { items };
     }
 
     /**

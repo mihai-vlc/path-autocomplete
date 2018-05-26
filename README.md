@@ -39,6 +39,8 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
         "/test": "${folder}/src/Actions/test", // alias for /test
         "/": "${folder}/src", // the absolute root folder is now /src,
         "$root": ${folder}/src // the relative root folder is now /src
+        // or multiple folders for one mapping
+        "$root": ["${folder}/p1/src", "${folder}/p2/src"] // the root is now relative to both p1/src and p2/src
     }
     ```
 
@@ -81,6 +83,12 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 - Updates the behavior of `extensionOnImport` to be taken into account only on import statements line.
 - Adds the `path-autocomplete.includeExtension` option to control the extension on standard paths. (#45)
 - Fixes the completion kind for folders and files (#43)
+- Adds support for merging multiple folders in the path mappings configuration
+```
+"path-autocomplete.pathMappings": {
+    "$root": ["${folder}/p1/src", "${folder}/p2/src"]
+}
+```
 
 #### 1.9.0
 - Adds `{` and `[` as separators for the current path
