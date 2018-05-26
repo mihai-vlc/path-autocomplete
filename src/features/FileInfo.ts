@@ -1,8 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-const loc = '';
-
 export class FileInfo {
     private type: string;
     private name: string;
