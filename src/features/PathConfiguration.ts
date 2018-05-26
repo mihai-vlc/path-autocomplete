@@ -2,6 +2,7 @@ import * as vs from 'vscode';
 
 interface PathConfigurationValues {
     withExtension?: boolean,
+    withExtensionOnImport?: boolean,
     excludedItems?: [{
         [key: string]: {
             when: string
@@ -34,7 +35,8 @@ export default class PathConfiguration {
     update(fileUri?: vs.Uri) {
         var codeConfiguration = vs.workspace.getConfiguration('path-autocomplete', fileUri || null);
 
-        this.data.withExtension = codeConfiguration.get('extensionOnImport');
+        this.data.withExtension = codeConfiguration.get('includeExtension');
+        this.data.withExtensionOnImport = codeConfiguration.get('extensionOnImport');
         this.data.excludedItems = codeConfiguration.get('excludedItems');
         this.data.pathMappings = codeConfiguration.get('pathMappings');
         this.data.transformations = codeConfiguration.get('transformations');

@@ -28,13 +28,19 @@
         "path-autocomplete.extensionOnImport": {
           "type": "boolean",
           "default": false,
-          "description": "Adds the file extension to a import statements",
+          "description": "Adds the extension when inserting file on import statements.",
+          "scope": "resource"
+        },
+        "path-autocomplete.includeExtension": {
+          "type": "boolean",
+          "default": true,
+          "description": "Adds the extension when inserting file names.",
           "scope": "resource"
         },
         "path-autocomplete.excludedItems": {
           "type": "object",
           "default": {},
-          "description": "Allows you to exclude certain files from the suggestions",
+          "description": "Allows you to exclude certain files from the suggestions.",
           "scope": "resource"
         },
         "path-autocomplete.pathMappings": {

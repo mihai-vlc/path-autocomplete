@@ -15,6 +15,7 @@ configuration.update();
 export class PathAutocomplete implements vs.CompletionItemProvider {
 
     currentFile: string;
+    currentLine: string;
 
     provideCompletionItems(document: vs.TextDocument, position: vs.Position, token: vs.CancellationToken): Thenable<vs.CompletionItem[]> {
         var currentLine = document.getText(document.lineAt(position).range);
@@ -23,6 +24,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         configuration.update(document.uri);
 
         this.currentFile = document.fileName;
+        this.currentLine = currentLine;
 
         if (!this.shouldProvide(currentLine, position.character)) {
             return Promise.resolve([]);
@@ -72,9 +74,18 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         });
     }
 
+    isExtensionEnabled(): boolean {
+        if (this.currentLine.indexOf('import ') > -1) {
+            return configuration.data.withExtensionOnImport;
+        }
+
+        return configuration.data.withExtension;
+    }
+
     getInsertText(file: FileInfo): string {
         var insertText = '';
-        if (configuration.data.withExtension || file.isDirectory()) {
+
+        if (this.isExtensionEnabled() || file.isDirectory()) {
             insertText = path.basename(file.getName());
         } else {
             // remove the extension

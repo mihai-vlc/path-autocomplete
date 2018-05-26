@@ -19,7 +19,8 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 `ext install path-autocomplete`
 
 ## Options
-- `path-autocomplete.extensionOnImport` - boolean If true it will append the extension as well when inserting the file name
+- `path-autocomplete.extensionOnImport` - boolean If true it will append the extension as well when inserting the file name on import statements.
+- `path-autocomplete.includeExtension` - boolean If true it will append the extension as well when inserting the file name.
 - `path-autocomplete.excludedItems`  
     This option allows you to exclude certain files from the suggestions.  
     ```
@@ -75,6 +76,10 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 
 ## Release notes
+
+#### 1.10.0
+- Updates the behavior of `extensionOnImport` to be taken into account only on import statements line.
+- Adds the `path-autocomplete.includeExtension` option to control the extension on standard paths.
 
 #### 1.9.0
 - Adds `{` and `[` as separators for the current path
