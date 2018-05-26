@@ -79,7 +79,8 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 #### 1.10.0
 - Updates the behavior of `extensionOnImport` to be taken into account only on import statements line.
-- Adds the `path-autocomplete.includeExtension` option to control the extension on standard paths.
+- Adds the `path-autocomplete.includeExtension` option to control the extension on standard paths. (#45)
+- Fixes the completion kind for folders and files (#43)
 
 #### 1.9.0
 - Adds `{` and `[` as separators for the current path

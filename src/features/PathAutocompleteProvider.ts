@@ -58,11 +58,12 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     }
 
                     completion.sortText = 'd';
+                    completion.kind = vs.CompletionItemKind.Folder;
                 } else {
                     completion.sortText = 'f';
+                    completion.kind = vs.CompletionItemKind.File;
                 }
 
-                completion.kind = vs.CompletionItemKind.File;
 
                 return completion;
             });
