@@ -70,7 +70,7 @@
         "path-autocomplete.useBackslash": {
           "type": "boolean",
           "default": false,
-          "description": "If enabled it use use backslash (\\) as a path separator.",
+          "description": "If enabled it will use backslash (\\) as a path separator.",
           "scope": "resource"
         },
         "path-autocomplete.enableFolderTrailingSlash": {
