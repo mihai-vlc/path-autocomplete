@@ -16,6 +16,8 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
     currentFile: string;
     currentLine: string;
+    currentPosition: number;
+    insideString: boolean;
 
     provideCompletionItems(document: vs.TextDocument, position: vs.Position, token: vs.CancellationToken): Thenable<vs.CompletionItem[]> {
         var currentLine = document.getText(document.lineAt(position).range);
@@ -25,8 +27,9 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         this.currentFile = document.fileName;
         this.currentLine = currentLine;
+        this.currentPosition = position.character;
 
-        if (!this.shouldProvide(currentLine, position.character)) {
+        if (!this.shouldProvide()) {
             return Promise.resolve([]);
         }
 
@@ -36,7 +39,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return Promise.resolve([]);
         }
 
-        return this.getFolderItems(foldersPath).then((items: FileInfo[]) => {
+        var result = this.getFolderItems(foldersPath).then((items: FileInfo[]) => {
             // build the list of the completion items
             var result = items.filter(self.filter, self).map((file) => {
                 var completion = new vs.CompletionItem(file.getName());
@@ -45,14 +48,24 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
                 // show folders before files
                 if (file.isDirectory()) {
-                    completion.label += '/';
+                    if (configuration.data.useBackslash) {
+                        completion.label += '\\';
+                    } else {
+                        completion.label += '/';
+                    }
 
                     if (configuration.data.enableFolderTrailingSlash) {
+                        var commandText = '/';
+
+                        if (configuration.data.useBackslash) {
+                            commandText = this.isInsideQuotes() ? '\\\\' : '\\';
+                        }
+
                         completion.command = {
                             command: 'default:type',
                             title: 'triggerSuggest',
                             arguments: [{
-                                text: '/'
+                                text: commandText
                             }]
                         };
                     }
@@ -68,11 +81,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 return completion;
             });
 
-            // add up one folder item
+            // add the `up one folder` item
             result.unshift(new vs.CompletionItem('..'))
 
             return Promise.resolve(result);
         });
+
+        return result;
     }
 
     /**
@@ -95,6 +110,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         } else {
             // remove the extension
             insertText = path.basename(file.getName(), path.extname(file.getName()));
+        }
+
+        if (configuration.data.useBackslash && this.isInsideQuotes()) {
+            // determine if we should insert an additional backslash
+            if (this.currentLine[this.currentPosition - 2] != '\\') {
+                insertText = '\\' + insertText;
+            }
         }
 
         // apply the transformations
@@ -340,11 +362,20 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     /**
      * Determine if we should provide path completion.
      */
-    shouldProvide(currentLine: string, position: number) {
+    shouldProvide() {
         if (configuration.data.triggerOutsideStrings) {
             return true;
         }
 
+        return this.isInsideQuotes();
+    }
+
+    /**
+     * Determines if the cursor is inside quotes.
+     */
+    isInsideQuotes(): boolean {
+        var currentLine = this.currentLine;
+        var position = this.currentPosition;
         var quotes = {
             single: 0,
             double: 0,

@@ -23,7 +23,8 @@ interface PathConfigurationValues {
     pathSeparators?: string
     homeDirectory?: string,
     workspaceFolderPath?: string,
-    workspaceRootPath?: string
+    workspaceRootPath?: string,
+    useBackslash?: boolean
 }
 
 export default class PathConfiguration {
@@ -43,6 +44,7 @@ export default class PathConfiguration {
         this.data.pathSeparators = codeConfiguration.get('pathSeparators');
         this.data.transformations = codeConfiguration.get('transformations');
         this.data.triggerOutsideStrings = codeConfiguration.get('triggerOutsideStrings');
+        this.data.useBackslash = codeConfiguration.get('useBackslash');
         this.data.enableFolderTrailingSlash = codeConfiguration.get('enableFolderTrailingSlash');
         this.data.homeDirectory = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 

@@ -67,6 +67,7 @@ The default value is: ` \t({[`
         - `replaceString` - the replacement string
 - `path-autocomplete.triggerOutsideStrings` boolean - if true it will trigger the autocomplete outside of quotes
 - `path-autocomplete.enableFolderTrailingSlash` boolean - if true it will add a slash after the insertion of a folder path that will trigger the autocompletion.
+- `path-autocomplete.useBackslash` boolean - if true it will use `\\` when iserting the paths.
 
 ## Tips
 - if you want to use this in markdown or simple text files you need to enable `path-autocomplete.triggerOutsideStrings`
@@ -77,6 +78,9 @@ The default value is: ` \t({[`
 
 
 ## Release notes
+
+#### 1.12.0
+Adds the `path-autocomplete.useBackslash` option to enable the use of `\\` for windows paths.
 
 #### 1.11.0
 Adds the `path-autocomplete.pathSeparators` option to control the separators when 

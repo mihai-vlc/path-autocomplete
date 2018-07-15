@@ -6,7 +6,7 @@ export function activate(context: vscode.ExtensionContext) {
     var selector : vscode.DocumentSelector = [{
         pattern: '**'
     }];
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(selector, new PathAutocomplete(), '/'));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(selector, new PathAutocomplete(), '/', '\\'));
 }
 
 // this method is called when your extension is deactivated
