@@ -20,6 +20,7 @@ interface PathConfigurationValues {
     }],
     triggerOutsideStrings?: boolean,
     enableFolderTrailingSlash?: boolean,
+    pathSeparators?: string
     homeDirectory?: string,
     workspaceFolderPath?: string,
     workspaceRootPath?: string
@@ -39,6 +40,7 @@ export default class PathConfiguration {
         this.data.withExtensionOnImport = codeConfiguration.get('extensionOnImport');
         this.data.excludedItems = codeConfiguration.get('excludedItems');
         this.data.pathMappings = codeConfiguration.get('pathMappings');
+        this.data.pathSeparators = codeConfiguration.get('pathSeparators');
         this.data.transformations = codeConfiguration.get('transformations');
         this.data.triggerOutsideStrings = codeConfiguration.get('triggerOutsideStrings');
         this.data.enableFolderTrailingSlash = codeConfiguration.get('enableFolderTrailingSlash');

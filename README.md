@@ -44,10 +44,9 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
     }
     ```
 
-    Available variables:
-    - `${workspace}` - the path of the main folder of the workspace (usually first one in the list)
-    - `${folder}` - the path of the vscode top folder for the current file
-    - `${home}` - the user home directory
+- `path-autocomplete.pathSeparators` - string Lists the separators used for extracting the inserted path when used outside strings.
+The default value is: ` \t({[`
+
 - `path-autocomplete.transformations`
     List of custom transformation applied to the inserted text.  
     Example: replace `_` with an empty string when selecting a SCSS partial file. 
@@ -78,6 +77,10 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 
 
 ## Release notes
+
+#### 1.11.0
+Adds the `path-autocomplete.pathSeparators` option to control the separators when 
+inserting the path outside strings.
 
 #### 1.10.0
 - Updates the behavior of `extensionOnImport` to be taken into account only on import statements line.

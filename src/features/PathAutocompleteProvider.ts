@@ -75,6 +75,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         });
     }
 
+    /**
+     * Detemines if the file extension should be included in the selected options when
+     * the selection is made.
+     */
     isExtensionEnabled(): boolean {
         if (this.currentLine.indexOf('import ') > -1) {
             return configuration.data.withExtensionOnImport;
@@ -193,6 +197,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     getUserPath(currentLine: string, currentPosition: number): string {
         var lastQuote = -1;
         var lastSeparator = -1;
+        var pathSepartors = configuration.data.pathSeparators.split('');
 
         for (var i = 0; i < currentPosition; i++) {
             var c = currentLine[i];
@@ -203,8 +208,8 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 continue;
             }
 
-            // handle space, tabs and ( for support outside strings
-            if (c == " " || c == "\t" || c == '(' || c == '{' || c == '[') {
+            // handle separators for support outside strings
+            if (pathSepartors.indexOf(c) > -1) {
                 lastSeparator = i;
                 continue;
             }

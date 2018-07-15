@@ -2,7 +2,7 @@
   "name": "path-autocomplete",
   "displayName": "Path Autocomplete",
   "description": "Provides path completion for visual studio code.",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "publisher": "ionutvmi",
   "icon": "icon.png",
   "repository": {
@@ -47,6 +47,12 @@
           "type": "object",
           "default": {},
           "description": "Defines custom mappings for the autocomplete paths.",
+          "scope": "resource"
+        },
+        "path-autocomplete.pathSeparators": {
+          "type": "string",
+          "default": " \t({[",
+          "description": "Defines the separators for support outside string.",
           "scope": "resource"
         },
         "path-autocomplete.transformations": {
