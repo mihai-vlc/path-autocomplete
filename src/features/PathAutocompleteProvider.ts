@@ -363,6 +363,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Determine if we should provide path completion.
      */
     shouldProvide() {
+        if (configuration.data.ignoredFilesPattern && minimatch(this.currentFile, configuration.data.ignoredFilesPattern)) {
+            return false;
+        }
+
         if (configuration.data.triggerOutsideStrings) {
             return true;
         }
