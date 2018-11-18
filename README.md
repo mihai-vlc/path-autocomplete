@@ -71,7 +71,6 @@ The default value is: ` \t({[`
 - `path-autocomplete.useBackslash` boolean - if true it will use `\\` when iserting the paths.
 - `path-autocomplete.ignoredFilesPattern` - string - Glob patterns for disabling the path completion in the specified file types. Example: "**/*.{css,scss}"
 
-
 ## Tips
 - if you want to use this in markdown or simple text files you need to enable `path-autocomplete.triggerOutsideStrings`
 
