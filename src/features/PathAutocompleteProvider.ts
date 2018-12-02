@@ -293,6 +293,15 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         var items = [];
 
         Object.keys(configuration.data.pathMappings || {})
+            // if insertedPath is '@view/'
+            // and mappings is [{key: '@', ...}, {key: '@view', ...}]
+            // and it will match '@' and return wrong items { currentDir: 'xxx',  insertedPath: 'view/'}
+            // solution : Sort keys by matching longest prefix, and it will match key(@view) first
+            .sort((key1, key2) => {
+                const f1 = insertedPath.startsWith(key1) ? key1.length : 0;
+                const f2 = insertedPath.startsWith(key2) ? key2.length : 0;
+                return f2 - f1;
+            })
             .map((key) => {
                 var candidatePaths = configuration.data.pathMappings[key];
 
