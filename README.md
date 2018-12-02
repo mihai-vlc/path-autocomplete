@@ -81,6 +81,10 @@ The default value is: ` \t({[`
 
 ## Release notes
 
+#### 1.13.1
+Fixes the mapping of keys with the same prefix.
+
+
 #### 1.13.0
 Adds the `path-autocomplete.ignoredFilesPattern` option to disable the extension on certain file types.  
 Example configuration:
