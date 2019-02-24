@@ -71,6 +71,24 @@ The default value is: ` \t({[`
 - `path-autocomplete.useBackslash` boolean - if true it will use `\\` when iserting the paths.
 - `path-autocomplete.ignoredFilesPattern` - string - Glob patterns for disabling the path completion in the specified file types. Example: "**/*.{css,scss}"
 
+## Configure VSCode to recognize path aliases
+
+VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>+<kbd>click</kbd> to open files. To fix this you need to create `jsconfig.json` or `tsconfig.json` to the root of your project and define your alises. An example configuration:
+
+```
+{
+  "compilerOptions": {
+    "target": "esnext", // define to your liking
+    "baseUrl": "./",
+    "paths": {
+      "test/*": ["src/actions/test"],
+      "assets/*" ["src/assets"]
+    }
+  },
+  "exclude": ["node_modules"] // Optional
+}
+```
+
 ## Tips
 - if you want to use this in markdown or simple text files you need to enable `path-autocomplete.triggerOutsideStrings`
 
