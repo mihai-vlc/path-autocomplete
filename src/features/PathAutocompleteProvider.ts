@@ -178,28 +178,32 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         var userPath = this.getUserPath(currentLine, currentPosition);
         var mappingResult = this.applyMapping(userPath);
-        
+
         return mappingResult.items.map((item) => {
             var insertedPath = item.insertedPath;
             var currentDir = item.currentDir || this.getCurrentDirectory(fileName, insertedPath);
-            
+
             // relative to the disk
             if (insertedPath.match(/^[a-z]:/i)) {
-                return path.resolve(insertedPath);
+                return [path.resolve(insertedPath)];
             }
 
             // user folder
             if (insertedPath.startsWith('~')) {
-                return path.join(configuration.data.homeDirectory, insertedPath.substring(1));
+                return [path.join(configuration.data.homeDirectory, insertedPath.substring(1))];
             }
 
             // npm package
             if (this.isNodePackage(insertedPath, currentLine)) {
-                return path.join(this.getNodeModulesPath(currentDir), insertedPath);
+                return [path.join(this.getNodeModulesPath(currentDir), insertedPath), path.join(currentDir, insertedPath)];
             }
 
-            return path.join(currentDir, insertedPath);
+            return [path.join(currentDir, insertedPath)];
         })
+        // merge the resulted path
+        .reduce((flat, toFlatten) => {
+            return flat.concat(toFlatten);
+        }, [])
         // keep only valid paths
         .filter(folderPath => {
             if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
@@ -313,13 +317,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     if (workspaceRootPath) {
                         candidatePath = candidatePath.replace('${workspace}', workspaceRootPath);
                     }
-    
+
                     if (workspaceFolderPath) {
                         candidatePath = candidatePath.replace('${folder}', workspaceFolderPath);
                     }
-    
+
                     candidatePath = candidatePath.replace('${home}', configuration.data.homeDirectory);
-    
+
                     return {
                         key: key,
                         path: candidatePath
@@ -342,7 +346,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 // stop after the first mapping found
                 return found;
             });
-        
+
         // no mapping was found, use the raw path inserted by the user
         if (items.length === 0) {
             items.push({
@@ -354,7 +358,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     }
 
     /**
-     * Determine if the current path
+     * Determine if the current path matches the pattern for a node module
      */
     isNodePackage(insertedPath: string, currentLine: string) {
         if (!currentLine.match(/require|import/)) {

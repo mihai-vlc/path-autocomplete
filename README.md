@@ -99,9 +99,11 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
 
 ## Release notes
 
+#### 1.13.2
+Fixes the mapping conflict with the node modules. Fixes #30.
+
 #### 1.13.1
 Fixes the mapping of keys with the same prefix.
-
 
 #### 1.13.0
 Adds the `path-autocomplete.ignoredFilesPattern` option to disable the extension on certain file types.  
