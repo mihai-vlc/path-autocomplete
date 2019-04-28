@@ -93,8 +93,12 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
 - if you want to use this in markdown or simple text files you need to enable `path-autocomplete.triggerOutsideStrings`
 
 - `./` for relative paths
+> If `./` doesn't work properly, add this to `keybindings.json`: `{ "key": ".", "command": "" }`. Refer to https://github.com/ChristianKohler/PathIntellisense/issues/9
 
-    If `./` doesn't work properly, add this to `keybindings.json`: `{ "key": ".", "command": "" }`. Refer to https://github.com/ChristianKohler/PathIntellisense/issues/9
+- When I use aliases I can't jump to imported file on Ctrl + Click
+> This is controlled by the compiler options in jsconfig.json. You can create the JSON file in your project root and add paths for your aliases.  
+> jsconfig.json Reference  
+> https://code.visualstudio.com/docs/languages/jsconfig#_using-webpack-aliases
 
 
 ## Release notes
