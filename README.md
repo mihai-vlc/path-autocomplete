@@ -99,6 +99,9 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
 
 ## Release notes
 
+#### 1.13.3
+Fixes the completion items for json files. Fixes #47
+
 #### 1.13.2
 Fixes the mapping conflict with the node modules. Fixes #30.
 

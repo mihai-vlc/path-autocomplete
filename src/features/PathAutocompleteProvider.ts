@@ -77,6 +77,9 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     completion.kind = vs.CompletionItemKind.File;
                 }
 
+                // this is deprecated but still needed for the completion to work
+                // in json files
+                completion.textEdit = new vs.TextEdit(new vs.Range(position, position), completion.insertText);
 
                 return completion;
             });
