@@ -98,7 +98,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * the selection is made.
      */
     isExtensionEnabled(): boolean {
-        if (this.currentLine.indexOf('import ') > -1) {
+        if (this.currentLine.match(/require|import/)) {
             return configuration.data.withExtensionOnImport;
         }
 
