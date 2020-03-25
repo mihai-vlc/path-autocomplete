@@ -103,7 +103,7 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
 
 ## Release notes
 
-#### 1.13.4
+#### 1.13.5
 resolve #72 - include `require` in the "extensionOnImport" preference
 
 #### 1.13.3
