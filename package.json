@@ -28,7 +28,7 @@
         "path-autocomplete.extensionOnImport": {
           "type": "boolean",
           "default": false,
-          "description": "Adds the extension when inserting file on import statements.",
+          "description": "Adds the extension when inserting file on import or require statements.",
           "scope": "resource"
         },
         "path-autocomplete.includeExtension": {

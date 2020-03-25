@@ -20,7 +20,7 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 `ext install path-autocomplete`
 
 ## Options
-- `path-autocomplete.extensionOnImport` - boolean If true it will append the extension as well when inserting the file name on import statements.
+- `path-autocomplete.extensionOnImport` - boolean If true it will append the extension as well when inserting the file name on `import` or `require` statements.
 - `path-autocomplete.includeExtension` - boolean If true it will append the extension as well when inserting the file name.
 - `path-autocomplete.excludedItems`  
     This option allows you to exclude certain files from the suggestions.  
@@ -99,7 +99,7 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
 > This is controlled by the compiler options in jsconfig.json. You can create the JSON file in your project root and add paths for your aliases.  
 > jsconfig.json Reference  
 > https://code.visualstudio.com/docs/languages/jsconfig#_using-webpack-aliases
-
+- if you have issues with duplicate suggestions please use the `path-autocomplete.ignoredFilesPatter` option to disable the path autocomplete in certain file types
 
 ## Release notes
 
