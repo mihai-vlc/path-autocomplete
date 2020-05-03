@@ -1,5 +1,5 @@
 # Path Autocomplete for Visual Studio Code
-Provides path completion for visual studio code.  
+Provides path completion for visual studio code.
 
 <img src="https://raw.githubusercontent.com/ionutvmi/path-autocomplete/master/demo/path-autocomplete.gif" alt="demo gif" />
 
@@ -22,8 +22,8 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 ## Options
 - `path-autocomplete.extensionOnImport` - boolean If true it will append the extension as well when inserting the file name on `import` or `require` statements.
 - `path-autocomplete.includeExtension` - boolean If true it will append the extension as well when inserting the file name.
-- `path-autocomplete.excludedItems`  
-    This option allows you to exclude certain files from the suggestions.  
+- `path-autocomplete.excludedItems`
+    This option allows you to exclude certain files from the suggestions.
     ```
     "path-autocomplete.excludedItems": {
         "**/*.js": { "when": "**/*.ts" }, // ignore js files if i'm inside a ts file
@@ -31,9 +31,9 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
         "**/{.git,node_modules}": { "when": "**" } // always ignore .git and node_modules folders
     }
     ```
-    
+
     [minimatch](https://www.npmjs.com/package/minimatch) is used to check if the files match the pattern.
-- `path-autocomplete.pathMappings`  
+- `path-autocomplete.pathMappings`
     Useful for defining aliases for absolute or relative paths.
     ```
     "path-autocomplete.pathMappings": {
@@ -49,8 +49,8 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 The default value is: ` \t({[`
 
 - `path-autocomplete.transformations`
-    List of custom transformation applied to the inserted text.  
-    Example: replace `_` with an empty string when selecting a SCSS partial file. 
+    List of custom transformation applied to the inserted text.
+    Example: replace `_` with an empty string when selecting a SCSS partial file.
     ```
     "path-autocomplete.transformations": [{
         "type": "replace",
@@ -62,8 +62,8 @@ The default value is: ` \t({[`
     ```
 
     Supported transformation:
-    - `replace` - Performs a string replace on the selected item text.  
-        Parameters:  
+    - `replace` - Performs a string replace on the selected item text.
+        Parameters:
         - `regex` - a regex pattern
         - `replaceString` - the replacement string
 - `path-autocomplete.triggerOutsideStrings` boolean - if true it will trigger the autocomplete outside of quotes
@@ -82,7 +82,7 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
     "baseUrl": "./",
     "paths": {
       "test/*": ["src/actions/test"],
-      "assets/*" ["src/assets"]
+      "assets/*": ["src/assets"]
     }
   },
   "exclude": ["node_modules"] // Optional
@@ -96,8 +96,8 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
 > If `./` doesn't work properly, add this to `keybindings.json`: `{ "key": ".", "command": "" }`. Refer to https://github.com/ChristianKohler/PathIntellisense/issues/9
 
 - When I use aliases I can't jump to imported file on Ctrl + Click
-> This is controlled by the compiler options in jsconfig.json. You can create the JSON file in your project root and add paths for your aliases.  
-> jsconfig.json Reference  
+> This is controlled by the compiler options in jsconfig.json. You can create the JSON file in your project root and add paths for your aliases.
+> jsconfig.json Reference
 > https://code.visualstudio.com/docs/languages/jsconfig#_using-webpack-aliases
 - if you have issues with duplicate suggestions please use the `path-autocomplete.ignoredFilesPatter` option to disable the path autocomplete in certain file types
 
@@ -106,7 +106,7 @@ The release notes are available in the [CHANGELOG.md](CHANGELOG.md) file.
 
 ## Author
 Mihai Ionut Vilcu
- 
+
 + [github/ionutvmi](https://github.com/ionutvmi)
 + [twitter/ionutvmi](http://twitter.com/ionutvmi)
 
