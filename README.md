@@ -70,6 +70,14 @@ The default value is: ` \t({[`
 - `path-autocomplete.enableFolderTrailingSlash` boolean - if true it will add a slash after the insertion of a folder path that will trigger the autocompletion.
 - `path-autocomplete.useBackslash` boolean - if true it will use `\\` when iserting the paths.
 - `path-autocomplete.ignoredFilesPattern` - string - Glob patterns for disabling the path completion in the specified file types. Example: "**/*.{css,scss}"
+- `path-autocomplete.ignoredPrefixes` array - list of ignored prefixes to disable suggestions
+    on certain preceeding words/characters.
+    Example:
+    ```js
+        "path-autocomplete.ignoredPrefixes": [
+            "//" // type double slash and no suggesstions will be displayed
+        ]
+    ```
 
 ## Configure VSCode to recognize path aliases
 

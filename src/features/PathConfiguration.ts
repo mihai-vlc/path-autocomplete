@@ -25,7 +25,8 @@ interface PathConfigurationValues {
     workspaceFolderPath?: string,
     workspaceRootPath?: string,
     useBackslash?: boolean,
-    ignoredFilesPattern?: string
+    ignoredFilesPattern?: string,
+    ignoredPrefixes?: Array<string>
 }
 
 export default class PathConfiguration {
@@ -48,6 +49,7 @@ export default class PathConfiguration {
         this.data.useBackslash = codeConfiguration.get('useBackslash');
         this.data.enableFolderTrailingSlash = codeConfiguration.get('enableFolderTrailingSlash');
         this.data.ignoredFilesPattern = codeConfiguration.get('ignoredFilesPattern');
+        this.data.ignoredPrefixes = codeConfiguration.get('ignoredPrefixes');
         this.data.homeDirectory = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
         var workspaceRootFolder = vs.workspace.workspaceFolders ? vs.workspace.workspaceFolders[0] : null;

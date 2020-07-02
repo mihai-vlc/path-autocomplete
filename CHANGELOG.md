@@ -1,5 +1,8 @@
 # Path Autocomplete Change Log
 
+#### 1.14.0
+Added new option `path-autocomplete.ignoredPrefixes`. Fixes #81
+
 #### 1.13.6
 Moved the change log from the readme file to the `CHANGELOG.md` file.
 

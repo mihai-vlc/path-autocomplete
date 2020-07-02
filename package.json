@@ -2,7 +2,7 @@
   "name": "path-autocomplete",
   "displayName": "Path Autocomplete",
   "description": "Provides path completion for visual studio code.",
-  "version": "1.13.6",
+  "version": "1.14.0",
   "publisher": "ionutvmi",
   "icon": "icon.png",
   "repository": {
@@ -83,6 +83,12 @@
           "type": "string",
           "default": "",
           "description": "Glob patterns for disabling the path completion in the specified file types.",
+          "scope": "resource"
+        },
+        "path-autocomplete.ignoredPrefixes": {
+          "type": "array",
+          "default": [],
+          "description": "List of prefixes for which completions will be skipped.",
           "scope": "resource"
         }
       }

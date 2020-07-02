@@ -383,11 +383,43 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return false;
         }
 
+        if (this.isIgnoredPrefix()) {
+            return false;
+        }
+
         if (configuration.data.triggerOutsideStrings) {
             return true;
         }
 
         return this.isInsideQuotes();
+    }
+
+    /**
+     * Determines if the prefix of the path is in the ignored list
+     */
+    isIgnoredPrefix() {
+        var igoredPrefixes = configuration.data.ignoredPrefixes;
+
+        if (!igoredPrefixes || igoredPrefixes.length == 0) {
+            return false;
+        }
+
+        return igoredPrefixes.some((prefix) => {
+            var currentLine = this.currentLine;
+            var position = this.currentPosition;
+
+            if (prefix.length > currentLine.length) {
+                return false;
+            }
+
+            var candidate = currentLine.substring(position - prefix.length, position);
+
+            if (prefix == candidate) {
+                return true;
+            }
+
+            return false;
+        });
     }
 
     /**
