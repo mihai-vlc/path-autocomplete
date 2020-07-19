@@ -109,7 +109,7 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
 > This is controlled by the compiler options in jsconfig.json. You can create the JSON file in your project root and add paths for your aliases.
 > jsconfig.json Reference
 > https://code.visualstudio.com/docs/languages/jsconfig#_using-webpack-aliases
-- if you have issues with duplicate suggestions please use the `path-autocomplete.ignoredFilesPatter` option to disable the path autocomplete in certain file types
+- if you have issues with duplicate suggestions please use the `path-autocomplete.ignoredFilesPattern` option to disable the path autocomplete in certain file types
 
 ## Release notes
 The release notes are available in the [CHANGELOG.md](CHANGELOG.md) file.
