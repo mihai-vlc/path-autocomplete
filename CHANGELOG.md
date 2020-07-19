@@ -1,5 +1,15 @@
 # Path Autocomplete Change Log
 
+#### 1.15.0
+Added new rules for the excludedItems option.
+Stating with this version we can now do things like:
+```
+"path-autocomplete.excludedItems": {
+    "**": { "when": "**", "isDir": true }, // always ignore `folder` suggestions
+    "**/*.js": { "when": "**", "context": "import.*" }, // ignore .js file suggestions in all files when the current line matches the regex from the `context`
+}
+```
+
 #### 1.14.0
 Added new option `path-autocomplete.ignoredPrefixes`. Fixes #81
 

@@ -5,7 +5,9 @@ interface PathConfigurationValues {
     withExtensionOnImport?: boolean,
     excludedItems?: [{
         [key: string]: {
-            when: string
+            when: string,
+            isDir?: boolean,
+            context?: string
         }
     }],
     pathMappings?: [{

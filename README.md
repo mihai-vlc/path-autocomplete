@@ -28,7 +28,9 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
     "path-autocomplete.excludedItems": {
         "**/*.js": { "when": "**/*.ts" }, // ignore js files if i'm inside a ts file
         "**/*.map": { "when": "**" }, // always ignore *.map files
-        "**/{.git,node_modules}": { "when": "**" } // always ignore .git and node_modules folders
+        "**/{.git,node_modules}": { "when": "**" }, // always ignore .git and node_modules folders
+        "**": { "when": "**", "isDir": true }, // always ignore `folder` suggestions
+        "**/*.ts": { "when": "**", "context": "import.*" }, // ignore .ts file suggestions in all files when the current line matches the regex from the `context`
     }
     ```
 

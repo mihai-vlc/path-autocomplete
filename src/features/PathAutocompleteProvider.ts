@@ -455,21 +455,42 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     /**
      * Filter for the suggested items
      */
-    filter(file: FileInfo) {
+    filter(suggestionFile: FileInfo) {
         // no options configured
         if (!configuration.data.excludedItems || typeof configuration.data.excludedItems != 'object') {
             return true;
         }
 
         var currentFile = this.currentFile;
+        var currentLine = this.currentLine;
         var valid = true;
 
         Object.keys(configuration.data.excludedItems).forEach(function(item) {
-            var rule = configuration.data.excludedItems[item].when;
+            var exclusion = configuration.data.excludedItems[item];
 
-            if (minimatch(currentFile, rule) && minimatch(file.getPath(), item)) {
-                valid = false;
+            // check the local file name pattern
+            if (!minimatch(currentFile, exclusion.when)) {
+                return;
             }
+            
+            if (!minimatch(suggestionFile.getPath(), item)) {
+                return;
+            }
+
+            // check the local line context
+            if (exclusion.context) {
+                var contextRegex = new RegExp(exclusion.context);
+                if (!contextRegex.test(currentLine)) {
+                    return;
+                }
+            }
+
+            // exclude folders from the results
+            if (exclusion.isDir && !suggestionFile.isDirectory()) {
+                return;
+            }
+            
+            valid = false;
         });
 
         return valid;
