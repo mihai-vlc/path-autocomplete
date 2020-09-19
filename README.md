@@ -80,6 +80,8 @@ The default value is: ` \t({[`
             "//" // type double slash and no suggesstions will be displayed
         ]
     ```
+    
+- 
 
 ## Configure VSCode to recognize path aliases
 
@@ -110,6 +112,20 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
 > jsconfig.json Reference
 > https://code.visualstudio.com/docs/languages/jsconfig#_using-webpack-aliases
 - if you have issues with duplicate suggestions please use the `path-autocomplete.ignoredFilesPattern` option to disable the path autocomplete in certain file types
+- if you need more fine grained control for handing duplicate items you can use the `path-autocomplete.excludedItems` option as follows:
+```
+// disable all suggestions in HTML files, when the current line contains the href or src attributes
+"path-autocomplete.excludedItems": {
+        "**": {
+            "when": "**/*.html",
+            "context": "(src|href)=.*"
+        }
+},
+
+// for js and typescript you can disable the vscode suggestions using the following options
+"javascript.suggest.paths": false,
+"typescript.suggest.paths": false
+```
 
 ## Release notes
 The release notes are available in the [CHANGELOG.md](CHANGELOG.md) file.
@@ -118,7 +134,7 @@ The release notes are available in the [CHANGELOG.md](CHANGELOG.md) file.
 Mihai Ionut Vilcu
 
 + [github/ionutvmi](https://github.com/ionutvmi)
-+ [twitter/ionutvmi](http://twitter.com/ionutvmi)
++ [twitter/mihaivlc93](http://twitter.com/mihaivlc93)
 
 ## Credits
 This extension is based on [path-intellisense](https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense)
