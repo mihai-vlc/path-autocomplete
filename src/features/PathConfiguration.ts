@@ -21,6 +21,7 @@ interface PathConfigurationValues {
         }
     }],
     triggerOutsideStrings?: boolean,
+    disableUpOneFolder?: boolean,
     enableFolderTrailingSlash?: boolean,
     pathSeparators?: string
     homeDirectory?: string,
@@ -48,6 +49,7 @@ export default class PathConfiguration {
         this.data.pathSeparators = codeConfiguration.get('pathSeparators');
         this.data.transformations = codeConfiguration.get('transformations');
         this.data.triggerOutsideStrings = codeConfiguration.get('triggerOutsideStrings');
+        this.data.disableUpOneFolder = codeConfiguration.get('disableUpOneFolder');
         this.data.useBackslash = codeConfiguration.get('useBackslash');
         this.data.enableFolderTrailingSlash = codeConfiguration.get('enableFolderTrailingSlash');
         this.data.ignoredFilesPattern = codeConfiguration.get('ignoredFilesPattern');

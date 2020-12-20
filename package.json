@@ -2,7 +2,7 @@
   "name": "path-autocomplete",
   "displayName": "Path Autocomplete",
   "description": "Provides path completion for visual studio code.",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "publisher": "ionutvmi",
   "icon": "icon.png",
   "repository": {
@@ -65,6 +65,12 @@
           "type": "boolean",
           "default": false,
           "description": "Enables path autocompletion outside strings.",
+          "scope": "resource"
+        },
+        "path-autocomplete.disableUpOneFolder": {
+          "type": "boolean",
+          "default": true,
+          "description": "Disabled the .. option in the recommendations.",
           "scope": "resource"
         },
         "path-autocomplete.useBackslash": {

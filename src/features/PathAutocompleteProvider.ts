@@ -85,7 +85,9 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             });
 
             // add the `up one folder` item
-            result.unshift(new vs.CompletionItem('..'))
+            if (!configuration.data.disableUpOneFolder) {
+                result.unshift(new vs.CompletionItem('..'))
+            }
 
             return Promise.resolve(result);
         });
