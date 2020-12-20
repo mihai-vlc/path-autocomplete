@@ -8,6 +8,7 @@ Provides path completion for visual studio code.
 - it supports absolute path to the workspace (starting with /)
 - it supports absolute path to the file system (starts with: C:)
 - it supports paths relative to the user folder (starts with ~)
+- it supports parial paths (./tmp/fol will suggest ./tmp/folder1 if it exists)
 - it supports items exclusions via the `path-autocomplete.excludedItems` option
 - it supports npm packages (starting with a-z and not relative to disk)
 - it supports automatic suggestion after selecting a folder

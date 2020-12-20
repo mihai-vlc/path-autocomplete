@@ -1,5 +1,18 @@
 # Path Autocomplete Change Log
 
+#### 1.17.0
+Adds support for partial paths.
+Previously the completions were only generated if the path inserted by the user
+was a valid folder on the disk.  
+Starting with this version partial paths are suppored as well.
+Examples:
+```
+./tmp/folder1/   -- generates suggetions
+./tmp/fol        -- generates suggetions for ./tmp/ and filters out items that don't start with fol
+```
+This feature fixes: #87
+
+
 #### 1.16.0
 Added new option `path-autocomplete.disableUpOneFolder`. Fixes #89
 By default it's set to `true`.

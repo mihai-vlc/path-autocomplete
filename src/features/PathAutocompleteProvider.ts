@@ -18,6 +18,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     currentLine: string;
     currentPosition: number;
     insideString: boolean;
+    namePrefix: string;
 
     provideCompletionItems(document: vs.TextDocument, position: vs.Position, token: vs.CancellationToken): Thenable<vs.CompletionItem[]> {
         var currentLine = document.getText(document.lineAt(position).range);
@@ -28,6 +29,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         this.currentFile = document.fileName;
         this.currentLine = currentLine;
         this.currentPosition = position.character;
+        this.namePrefix = this.getNamePrefix();
 
         if (!this.shouldProvide()) {
             return Promise.resolve([]);
@@ -39,9 +41,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return Promise.resolve([]);
         }
 
-        var result = this.getFolderItems(foldersPath).then((items: FileInfo[]) => {
+        var folderItems = this.getFolderItems(foldersPath).then((items: FileInfo[]) => {
             // build the list of the completion items
             var result = items.filter(self.filter, self).map((file) => {
+
                 var completion = new vs.CompletionItem(file.getName());
 
                 completion.insertText = this.getInsertText(file);
@@ -77,6 +80,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     completion.kind = vs.CompletionItemKind.File;
                 }
 
+
                 // this is deprecated but still needed for the completion to work
                 // in json files
                 completion.textEdit = new vs.TextEdit(new vs.Range(position, position), completion.insertText);
@@ -92,7 +96,24 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return Promise.resolve(result);
         });
 
-        return result;
+        return folderItems;
+    }
+
+    /**
+     * Gets the name prefix for the completion item.
+     * This is used when the path that the user user typed so far
+     * contains part of the file/folder name
+     * Examples: 
+     *      /folder/Fi
+     *      /folder/subfo
+     */
+    getNamePrefix(): string {
+        var userPath = this.getUserPath(this.currentLine, this.currentPosition);
+        if (userPath.endsWith("/") || userPath.endsWith("\\")) {
+            return "";
+        }
+
+        return path.basename(userPath);
     }
 
     /**
@@ -138,6 +159,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         });
 
+        if (this.namePrefix) {
+            insertText = insertText.substr(this.namePrefix.length);
+        }
+
         return insertText;
     }
 
@@ -152,23 +177,23 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     if (err) {
                         return reject(err);
                     }
-                    var results = [];
+                    var fileResults = [];
 
                     items.forEach(item => {
                         try {
-                            results.push(new FileInfo(path.join(folderPath, item)));
+                            fileResults.push(new FileInfo(path.join(folderPath, item)));
                         } catch (err) {
                             // silently ignore permissions errors
                         }
                     });
 
-                    resolve(results);
+                    resolve(fileResults);
                 });
             });
         });
 
-        return Promise.all(results).then(results => {
-            return results.reduce((all: string[], currentResults: string[]) => {
+        return Promise.all(results).then(allResults => {
+            return allResults.reduce((all: string[], currentResults: string[]) => {
                 return all.concat(currentResults);
             }, []);
         });
@@ -209,6 +234,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         .reduce((flat, toFlatten) => {
             return flat.concat(toFlatten);
         }, [])
+        // keep only folders
+        .map((folderPath: string) => {
+            if (folderPath.endsWith("/") || folderPath.endsWith("\\")) {
+                return folderPath;
+            }
+            return path.dirname(folderPath);
+        })
         // keep only valid paths
         .filter(folderPath => {
             if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
@@ -265,7 +297,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         var rootPath = configuration.data.workspaceFolderPath;
 
         while (currentDir != path.dirname(currentDir)) {
-            console.log(currentDir);
+
             var candidatePath = path.join(currentDir, 'node_modules');
             if (fs.existsSync(candidatePath)) {
                 return candidatePath;
@@ -463,6 +495,11 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return true;
         }
 
+        // keep only the records that match the name prefix inserted by the user
+        if (this.namePrefix && (suggestionFile.getName().indexOf(this.namePrefix) != 0)) {
+            return false;
+        }
+
         var currentFile = this.currentFile;
         var currentLine = this.currentLine;
         var valid = true;
@@ -474,7 +511,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             if (!minimatch(currentFile, exclusion.when)) {
                 return;
             }
-            
+
             if (!minimatch(suggestionFile.getPath(), item)) {
                 return;
             }

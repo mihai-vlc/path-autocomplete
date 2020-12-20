@@ -2,7 +2,7 @@
   "name": "path-autocomplete",
   "displayName": "Path Autocomplete",
   "description": "Provides path completion for visual studio code.",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "publisher": "ionutvmi",
   "icon": "icon.png",
   "repository": {
