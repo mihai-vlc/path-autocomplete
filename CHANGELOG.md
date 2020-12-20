@@ -1,5 +1,10 @@
 # Path Autocomplete Change Log
 
+#### 1.16.0
+Added new option `path-autocomplete.disableUpOneFolder`. Fixes #89
+By default it's set to `true`.
+
+
 #### 1.15.0
 Added new rules for the excludedItems option.
 Stating with this version we can now do things like:
