@@ -215,12 +215,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
             // relative to the disk
             if (insertedPath.match(/^[a-z]:/i)) {
-                var resolved = path.resolve(insertedPath);
-                // restore trailing slashes if they were removed
-                if (resolved.slice(-1) != insertedPath.slice(-1)) {
-                    resolved += insertedPath.substr(-1);
-                }
-                return [resolved];
+                return [insertedPath];
             }
 
             // user folder
