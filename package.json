@@ -17,7 +17,11 @@
     "vscode": "^1.60.0"
   },
   "keywords": [
-    "multi-root ready"
+    "path",
+    "suggestion",
+    "autocomplete",
+    "intellisense",
+    "alias"
   ],
   "categories": [
     "Other"
