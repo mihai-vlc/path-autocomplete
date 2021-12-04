@@ -109,7 +109,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * contains part of the file/folder name
      * Examples:
      *      /folder/Fi
-     *      /folder/subfo
+     *      /folder/subfolder
      */
     getNamePrefix(): string {
         const userPath = this.getUserPath(this.currentLine, this.currentPosition);
@@ -121,7 +121,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     }
 
     /**
-     * Detemines if the file extension should be included in the selected options when
+     * Determines if the file extension should be included in the selected options when
      * the selection is made.
      */
     isExtensionEnabled(): boolean {
@@ -280,7 +280,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     getUserPath(currentLine: string, currentPosition: number): string {
         let lastQuote = -1;
         let lastSeparator = -1;
-        const pathSepartors = configuration.data.pathSeparators.split('');
+        const pathSeparators = configuration.data.pathSeparators.split('');
 
         for (let i = 0; i < currentPosition; i++) {
             const c = currentLine[i];
@@ -292,7 +292,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             }
 
             // handle separators for support outside strings
-            if (pathSepartors.indexOf(c) > -1) {
+            if (pathSeparators.indexOf(c) > -1) {
                 lastSeparator = i;
                 continue;
             }
@@ -460,13 +460,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Determines if the prefix of the path is in the ignored list
      */
     isIgnoredPrefix() {
-        const igoredPrefixes = configuration.data.ignoredPrefixes;
+        const ignoredPrefixes = configuration.data.ignoredPrefixes;
 
-        if (!igoredPrefixes || igoredPrefixes.length == 0) {
+        if (!ignoredPrefixes || ignoredPrefixes.length == 0) {
             return false;
         }
 
-        return igoredPrefixes.some((prefix) => {
+        return ignoredPrefixes.some((prefix) => {
             const currentLine = this.currentLine;
             const position = this.currentPosition;
 
