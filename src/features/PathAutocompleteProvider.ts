@@ -1,11 +1,11 @@
-import * as vs from 'vscode';
+import vs from 'vscode';
 import {FileInfo} from './FileInfo';
-import * as minimatch from 'minimatch';
+import minimatch from 'minimatch';
 import PathConfiguration from './PathConfiguration';
 
 // node modules
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 
 var configuration = new PathConfiguration();
 

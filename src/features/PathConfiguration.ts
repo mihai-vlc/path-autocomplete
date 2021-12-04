@@ -1,4 +1,4 @@
-import * as vs from 'vscode';
+import vs from 'vscode';
 
 interface PathConfigurationValues {
     withExtension?: boolean,

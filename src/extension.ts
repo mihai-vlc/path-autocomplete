@@ -1,5 +1,5 @@
 'use strict';
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import {PathAutocomplete} from './features/PathAutocompleteProvider';
 
 export function activate(context: vscode.ExtensionContext) {
