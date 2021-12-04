@@ -1,5 +1,5 @@
 import vs from 'vscode';
-import {FileInfo} from './FileInfo';
+import { FileInfo } from './FileInfo';
 import minimatch from 'minimatch';
 import PathConfiguration from './PathConfiguration';
 
@@ -13,14 +13,17 @@ var configuration = new PathConfiguration();
 configuration.update();
 
 export class PathAutocomplete implements vs.CompletionItemProvider {
-
     currentFile: string;
     currentLine: string;
     currentPosition: number;
     insideString: boolean;
     namePrefix: string;
 
-    provideCompletionItems(document: vs.TextDocument, position: vs.Position, token: vs.CancellationToken): Thenable<vs.CompletionItem[]> {
+    provideCompletionItems(
+        document: vs.TextDocument,
+        position: vs.Position,
+        token: vs.CancellationToken,
+    ): Thenable<vs.CompletionItem[]> {
         var currentLine = document.getText(document.lineAt(position).range);
         var self = this;
 
@@ -44,7 +47,6 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         var folderItems = this.getFolderItems(foldersPath).then((items: FileInfo[]) => {
             // build the list of the completion items
             var result = items.filter(self.filter, self).map((file) => {
-
                 var completion = new vs.CompletionItem(file.getName());
 
                 completion.insertText = this.getInsertText(file);
@@ -67,9 +69,11 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                         completion.command = {
                             command: 'default:type',
                             title: 'triggerSuggest',
-                            arguments: [{
-                                text: commandText
-                            }]
+                            arguments: [
+                                {
+                                    text: commandText,
+                                },
+                            ],
                         };
                     }
 
@@ -80,17 +84,19 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     completion.kind = vs.CompletionItemKind.File;
                 }
 
-
                 // this is deprecated but still needed for the completion to work
                 // in json files
-                completion.textEdit = new vs.TextEdit(new vs.Range(position, position), completion.insertText);
+                completion.textEdit = new vs.TextEdit(
+                    new vs.Range(position, position),
+                    completion.insertText,
+                );
 
                 return completion;
             });
 
             // add the `up one folder` item
             if (!configuration.data.disableUpOneFolder) {
-                result.unshift(new vs.CompletionItem('..'))
+                result.unshift(new vs.CompletionItem('..'));
             }
 
             return Promise.resolve(result);
@@ -103,14 +109,14 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Gets the name prefix for the completion item.
      * This is used when the path that the user user typed so far
      * contains part of the file/folder name
-     * Examples: 
+     * Examples:
      *      /folder/Fi
      *      /folder/subfo
      */
     getNamePrefix(): string {
         var userPath = this.getUserPath(this.currentLine, this.currentPosition);
-        if (userPath.endsWith("/") || userPath.endsWith("\\")) {
-            return "";
+        if (userPath.endsWith('/') || userPath.endsWith('\\')) {
+            return '';
         }
 
         return path.basename(userPath);
@@ -147,16 +153,20 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         // apply the transformations
         configuration.data.transformations.forEach((transform) => {
-            var fileNameRegex = transform.when && transform.when.fileName && new RegExp(transform.when.fileName);
+            var fileNameRegex =
+                transform.when && transform.when.fileName && new RegExp(transform.when.fileName);
             if (fileNameRegex && !file.getName().match(fileNameRegex)) {
                 return;
             }
 
             var parameters = transform.parameters || [];
             if (transform.type == 'replace' && parameters[0]) {
-                insertText = String.prototype.replace.call(insertText, new RegExp(parameters[0]), parameters[1]);
+                insertText = String.prototype.replace.call(
+                    insertText,
+                    new RegExp(parameters[0]),
+                    parameters[1],
+                );
             }
-
         });
 
         if (this.namePrefix) {
@@ -166,20 +176,19 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         return insertText;
     }
 
-
     /**
      * Builds a list of the available files and folders from the provided path.
      */
     getFolderItems(foldersPath: string[]) {
-        var results = foldersPath.map(folderPath => {
-            return new Promise(function(resolve, reject) {
-                fs.readdir(folderPath, function(err, items) {
+        var results = foldersPath.map((folderPath) => {
+            return new Promise(function (resolve, reject) {
+                fs.readdir(folderPath, function (err, items) {
                     if (err) {
                         return reject(err);
                     }
                     var fileResults = [];
 
-                    items.forEach(item => {
+                    items.forEach((item) => {
                         try {
                             fileResults.push(new FileInfo(path.join(folderPath, item)));
                         } catch (err) {
@@ -192,7 +201,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             });
         });
 
-        return Promise.all(results).then(allResults => {
+        return Promise.all(results).then((allResults) => {
             return allResults.reduce((all: string[], currentResults: string[]) => {
                 return all.concat(currentResults);
             }, []);
@@ -205,55 +214,63 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      *
      */
     getFoldersPath(fileName: string, currentLine: string, currentPosition: number): string[] {
-
         var userPath = this.getUserPath(currentLine, currentPosition);
         var mappingResult = this.applyMapping(userPath);
 
-        return mappingResult.items.map((item) => {
-            var insertedPath = item.insertedPath;
-            var currentDir = item.currentDir || this.getCurrentDirectory(fileName, insertedPath);
+        return (
+            mappingResult.items
+                .map((item) => {
+                    var insertedPath = item.insertedPath;
+                    var currentDir =
+                        item.currentDir || this.getCurrentDirectory(fileName, insertedPath);
 
-            // relative to the disk
-            if (insertedPath.match(/^[a-z]:/i)) {
-                var resolved = path.resolve(insertedPath);
-                // restore trailing slashes if they were removed
-                if (resolved.slice(-1) != insertedPath.slice(-1)) {
-                    resolved += insertedPath.substr(-1);
-                }
-                return [resolved];
-            }
+                    // relative to the disk
+                    if (insertedPath.match(/^[a-z]:/i)) {
+                        var resolved = path.resolve(insertedPath);
+                        // restore trailing slashes if they were removed
+                        if (resolved.slice(-1) != insertedPath.slice(-1)) {
+                            resolved += insertedPath.substr(-1);
+                        }
+                        return [resolved];
+                    }
 
-            // user folder
-            if (insertedPath.startsWith('~')) {
-                return [path.join(configuration.data.homeDirectory, insertedPath.substring(1))];
-            }
+                    // user folder
+                    if (insertedPath.startsWith('~')) {
+                        return [
+                            path.join(configuration.data.homeDirectory, insertedPath.substring(1)),
+                        ];
+                    }
 
-            // npm package
-            if (this.isNodePackage(insertedPath, currentLine)) {
-                return [path.join(this.getNodeModulesPath(currentDir), insertedPath), path.join(currentDir, insertedPath)];
-            }
+                    // npm package
+                    if (this.isNodePackage(insertedPath, currentLine)) {
+                        return [
+                            path.join(this.getNodeModulesPath(currentDir), insertedPath),
+                            path.join(currentDir, insertedPath),
+                        ];
+                    }
 
-            return [path.join(currentDir, insertedPath)];
-        })
-        // merge the resulted path
-        .reduce((flat, toFlatten) => {
-            return flat.concat(toFlatten);
-        }, [])
-        // keep only folders
-        .map((folderPath: string) => {
-            if (folderPath.endsWith("/") || folderPath.endsWith("\\")) {
-                return folderPath;
-            }
-            return path.dirname(folderPath);
-        })
-        // keep only valid paths
-        .filter(folderPath => {
-            if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
-                return false;
-            }
+                    return [path.join(currentDir, insertedPath)];
+                })
+                // merge the resulted path
+                .reduce((flat, toFlatten) => {
+                    return flat.concat(toFlatten);
+                }, [])
+                // keep only folders
+                .map((folderPath: string) => {
+                    if (folderPath.endsWith('/') || folderPath.endsWith('\\')) {
+                        return folderPath;
+                    }
+                    return path.dirname(folderPath);
+                })
+                // keep only valid paths
+                .filter((folderPath) => {
+                    if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
+                        return false;
+                    }
 
-            return true;
-        });
+                    return true;
+                })
+        );
     }
 
     /**
@@ -271,7 +288,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             var c = currentLine[i];
 
             // skip next character if escaped
-            if (c == "\\") {
+            if (c == '\\') {
                 i++;
                 continue;
             }
@@ -283,12 +300,12 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             }
 
             // handle quotes
-            if (c == "'" || c == '"' || c == "`") {
+            if (c == "'" || c == '"' || c == '`') {
                 lastQuote = i;
             }
         }
 
-        var startPosition = (lastQuote != -1) ? lastQuote : lastSeparator;
+        var startPosition = lastQuote != -1 ? lastQuote : lastSeparator;
 
         return currentLine.substring(startPosition + 1, currentPosition);
     }
@@ -302,7 +319,6 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         var rootPath = configuration.data.workspaceFolderPath;
 
         while (currentDir != path.dirname(currentDir)) {
-
             var candidatePath = path.join(currentDir, 'node_modules');
             if (fs.existsSync(candidatePath)) {
                 return candidatePath;
@@ -355,7 +371,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     candidatePaths = [candidatePaths];
                 }
 
-                return candidatePaths.map(candidatePath => {
+                return candidatePaths.map((candidatePath) => {
                     if (workspaceRootPath) {
                         candidatePath = candidatePath.replace('${workspace}', workspaceRootPath);
                     }
@@ -364,22 +380,28 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                         candidatePath = candidatePath.replace('${folder}', workspaceFolderPath);
                     }
 
-                    candidatePath = candidatePath.replace('${home}', configuration.data.homeDirectory);
+                    candidatePath = candidatePath.replace(
+                        '${home}',
+                        configuration.data.homeDirectory,
+                    );
 
                     return {
                         key: key,
-                        path: candidatePath
+                        path: candidatePath,
                     };
                 });
             })
             .some((mappings) => {
                 var found = false;
 
-                mappings.forEach(mapping => {
-                    if (insertedPath.startsWith(mapping.key) || (mapping.key === '$root' && !insertedPath.startsWith('.'))) {
+                mappings.forEach((mapping) => {
+                    if (
+                        insertedPath.startsWith(mapping.key) ||
+                        (mapping.key === '$root' && !insertedPath.startsWith('.'))
+                    ) {
                         items.push({
                             currentDir: mapping.path,
-                            insertedPath: insertedPath.replace(mapping.key, '')
+                            insertedPath: insertedPath.replace(mapping.key, ''),
                         });
                         found = true;
                     }
@@ -393,7 +415,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         if (items.length === 0) {
             items.push({
                 currentDir: '',
-                insertedPath
+                insertedPath,
             });
         }
         return { items };
@@ -418,7 +440,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Determine if we should provide path completion.
      */
     shouldProvide() {
-        if (configuration.data.ignoredFilesPattern && minimatch(this.currentFile, configuration.data.ignoredFilesPattern)) {
+        if (
+            configuration.data.ignoredFilesPattern &&
+            minimatch(this.currentFile, configuration.data.ignoredFilesPattern)
+        ) {
             return false;
         }
 
@@ -470,20 +495,20 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         var quotes = {
             single: 0,
             double: 0,
-            backtick: 0
+            backtick: 0,
         };
 
         // check if we are inside quotes
         for (var i = 0; i < position; i++) {
-            if (currentLine.charAt(i) == "'" && currentLine.charAt(i-1) != '\\') {
+            if (currentLine.charAt(i) == "'" && currentLine.charAt(i - 1) != '\\') {
                 quotes.single += quotes.single > 0 ? -1 : 1;
             }
 
-            if (currentLine.charAt(i) == '"' && currentLine.charAt(i-1) != '\\') {
+            if (currentLine.charAt(i) == '"' && currentLine.charAt(i - 1) != '\\') {
                 quotes.double += quotes.double > 0 ? -1 : 1;
             }
 
-            if (currentLine.charAt(i) == '`' && currentLine.charAt(i-1) != '\\') {
+            if (currentLine.charAt(i) == '`' && currentLine.charAt(i - 1) != '\\') {
                 quotes.backtick += quotes.backtick > 0 ? -1 : 1;
             }
         }
@@ -496,12 +521,15 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      */
     filter(suggestionFile: FileInfo) {
         // no options configured
-        if (!configuration.data.excludedItems || typeof configuration.data.excludedItems != 'object') {
+        if (
+            !configuration.data.excludedItems ||
+            typeof configuration.data.excludedItems != 'object'
+        ) {
             return true;
         }
 
         // keep only the records that match the name prefix inserted by the user
-        if (this.namePrefix && (suggestionFile.getName().indexOf(this.namePrefix) != 0)) {
+        if (this.namePrefix && suggestionFile.getName().indexOf(this.namePrefix) != 0) {
             return false;
         }
 
@@ -509,7 +537,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         var currentLine = this.currentLine;
         var valid = true;
 
-        Object.keys(configuration.data.excludedItems).forEach(function(item) {
+        Object.keys(configuration.data.excludedItems).forEach(function (item) {
             var exclusion = configuration.data.excludedItems[item];
 
             // check the local file name pattern
@@ -533,7 +561,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             if (exclusion.isDir && !suggestionFile.isDirectory()) {
                 return;
             }
-            
+
             valid = false;
         });
 

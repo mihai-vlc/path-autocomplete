@@ -1,35 +1,41 @@
 import vs from 'vscode';
 
 interface PathConfigurationValues {
-    withExtension?: boolean,
-    withExtensionOnImport?: boolean,
-    excludedItems?: [{
-        [key: string]: {
-            when: string,
-            isDir?: boolean,
-            context?: string
-        }
-    }],
-    pathMappings?: [{
-        [key: string]: string
-    }],
-    transformations?: [{
-        type: string,
-        parameters?: Array<any>,
-        when?: {
-            fileName?: string
-        }
-    }],
-    triggerOutsideStrings?: boolean,
-    disableUpOneFolder?: boolean,
-    enableFolderTrailingSlash?: boolean,
-    pathSeparators?: string
-    homeDirectory?: string,
-    workspaceFolderPath?: string,
-    workspaceRootPath?: string,
-    useBackslash?: boolean,
-    ignoredFilesPattern?: string,
-    ignoredPrefixes?: Array<string>
+    withExtension?: boolean;
+    withExtensionOnImport?: boolean;
+    excludedItems?: [
+        {
+            [key: string]: {
+                when: string;
+                isDir?: boolean;
+                context?: string;
+            };
+        },
+    ];
+    pathMappings?: [
+        {
+            [key: string]: string;
+        },
+    ];
+    transformations?: [
+        {
+            type: string;
+            parameters?: Array<any>;
+            when?: {
+                fileName?: string;
+            };
+        },
+    ];
+    triggerOutsideStrings?: boolean;
+    disableUpOneFolder?: boolean;
+    enableFolderTrailingSlash?: boolean;
+    pathSeparators?: string;
+    homeDirectory?: string;
+    workspaceFolderPath?: string;
+    workspaceRootPath?: string;
+    useBackslash?: boolean;
+    ignoredFilesPattern?: string;
+    ignoredPrefixes?: Array<string>;
 }
 
 export default class PathConfiguration {
@@ -54,9 +60,11 @@ export default class PathConfiguration {
         this.data.enableFolderTrailingSlash = codeConfiguration.get('enableFolderTrailingSlash');
         this.data.ignoredFilesPattern = codeConfiguration.get('ignoredFilesPattern');
         this.data.ignoredPrefixes = codeConfiguration.get('ignoredPrefixes');
-        this.data.homeDirectory = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+        this.data.homeDirectory = process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'];
 
-        var workspaceRootFolder = vs.workspace.workspaceFolders ? vs.workspace.workspaceFolders[0] : null;
+        var workspaceRootFolder = vs.workspace.workspaceFolders
+            ? vs.workspace.workspaceFolders[0]
+            : null;
         var workspaceFolder = workspaceRootFolder;
 
         if (fileUri) {
@@ -67,4 +75,3 @@ export default class PathConfiguration {
         this.data.workspaceRootPath = workspaceRootFolder && workspaceRootFolder.uri.fsPath;
     }
 }
-
