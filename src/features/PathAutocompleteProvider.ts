@@ -1,16 +1,28 @@
+import fs from 'fs';
+import fsAsync from 'fs/promises';
+import path from 'path';
+
 import vs from 'vscode';
-import { FileInfo } from './FileInfo';
 import minimatch from 'minimatch';
+import { FileInfo } from './FileInfo';
 import PathConfiguration from './PathConfiguration';
 
-// node modules
-import fs from 'fs';
-import path from 'path';
+interface MappingItem {
+    currentDir: string;
+    insertedPath: string;
+}
 
 const configuration = new PathConfiguration();
 
 // load the initial configurations
 configuration.update();
+
+function pathExists(path: string) {
+    return fsAsync
+        .access(path, fs.constants.F_OK)
+        .then(() => true)
+        .catch(() => false);
+}
 
 export class PathAutocomplete implements vs.CompletionItemProvider {
     private currentFile: string;
@@ -18,11 +30,11 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     private currentPosition: number;
     private namePrefix: string;
 
-    provideCompletionItems(
+    async provideCompletionItems(
         document: vs.TextDocument,
         position: vs.Position,
         _token: vs.CancellationToken,
-    ): Thenable<vs.CompletionItem[]> {
+    ): Promise<vs.CompletionItem[]> {
         const currentLine = document.getText(document.lineAt(position).range);
 
         configuration.update(document.uri);
@@ -33,83 +45,85 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         this.namePrefix = this.getNamePrefix();
 
         if (!this.shouldProvide()) {
-            return Promise.resolve([]);
+            return [];
         }
 
-        const foldersPath = this.getFoldersPath(document.fileName, currentLine, position.character);
+        const foldersPath = await this.getFoldersPath(
+            document.fileName,
+            currentLine,
+            position.character,
+        );
 
         if (foldersPath.length == 0) {
-            return Promise.resolve([]);
+            return [];
         }
 
-        const folderItems = this.getFolderItems(foldersPath).then((items: FileInfo[]) => {
-            // build the list of the completion items
-            const result = items.filter(this.filter, this).map((file) => {
-                const completion = new vs.CompletionItem(file.getName());
+        const folderItems = await this.getFolderItems(foldersPath);
 
-                completion.insertText = this.getInsertText(file);
+        // build the list of the completion items
+        const result = folderItems.filter(this.filter, this).map((file) => {
+            const completion = new vs.CompletionItem(file.getName());
 
-                // show folders before files
-                if (file.isDirectory()) {
-                    if (configuration.data.useBackslash) {
-                        completion.label += '\\';
-                    } else {
-                        completion.label += '/';
-                    }
+            completion.insertText = this.getInsertText(file);
 
-                    if (configuration.data.enableFolderTrailingSlash) {
-                        let commandText = '/';
-
-                        if (configuration.data.useBackslash) {
-                            commandText = this.isInsideQuotes() ? '\\\\' : '\\';
-                        }
-
-                        completion.command = {
-                            command: 'default:type',
-                            title: 'triggerSuggest',
-                            arguments: [
-                                {
-                                    text: commandText,
-                                },
-                            ],
-                        };
-                    }
-
-                    completion.sortText = 'd';
-                    completion.kind = vs.CompletionItemKind.Folder;
+            // show folders before files
+            if (file.isDirectory()) {
+                if (configuration.data.useBackslash) {
+                    completion.label += '\\';
                 } else {
-                    completion.sortText = 'f';
-                    completion.kind = vs.CompletionItemKind.File;
+                    completion.label += '/';
                 }
 
-                // this is deprecated but still needed for the completion to work
-                // in json files
-                completion.textEdit = new vs.TextEdit(
-                    new vs.Range(position, position),
-                    completion.insertText,
-                );
+                if (configuration.data.enableFolderTrailingSlash) {
+                    let commandText = '/';
 
-                return completion;
-            });
+                    if (configuration.data.useBackslash) {
+                        commandText = this.isInsideQuotes() ? '\\\\' : '\\';
+                    }
 
-            // add the `up one folder` item
-            if (!configuration.data.disableUpOneFolder) {
-                result.unshift(new vs.CompletionItem('..'));
+                    completion.command = {
+                        command: 'default:type',
+                        title: 'triggerSuggest',
+                        arguments: [
+                            {
+                                text: commandText,
+                            },
+                        ],
+                    };
+                }
+
+                completion.sortText = 'd';
+                completion.kind = vs.CompletionItemKind.Folder;
+            } else {
+                completion.sortText = 'f';
+                completion.kind = vs.CompletionItemKind.File;
             }
 
-            return Promise.resolve(result);
+            // this is deprecated but still needed for the completion to work
+            // in json files
+            completion.textEdit = new vs.TextEdit(
+                new vs.Range(position, position),
+                completion.insertText,
+            );
+
+            return completion;
         });
 
-        return folderItems;
+        // add the `up one folder` item
+        if (!configuration.data.disableUpOneFolder) {
+            result.unshift(new vs.CompletionItem('..'));
+        }
+
+        return result;
     }
 
     /**
      * Gets the name prefix for the completion item.
-     * This is used when the path that the user user typed so far
+     * This is used when the path that the user typed so far
      * contains part of the file/folder name
      * Examples:
-     *      /folder/Fi
-     *      /folder/subfolder
+     *      /folder/Fi => complete path is /folder/File
+     *      /folder/subfo => complete path is /folder/subfolder
      */
     getNamePrefix(): string {
         const userPath = this.getUserPath(this.currentLine, this.currentPosition);
@@ -177,33 +191,23 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     /**
      * Builds a list of the available files and folders from the provided path.
      */
-    getFolderItems(foldersPath: string[]) {
-        const results = foldersPath.map((folderPath) => {
-            return new Promise(function (resolve, reject) {
-                fs.readdir(folderPath, function (err, items) {
-                    if (err) {
-                        return reject(err);
+    async getFolderItems(foldersPath: string[]): Promise<FileInfo[]> {
+        const getFileInfoPromises = foldersPath.map(async (folderPath) => {
+            const filenames = await fsAsync.readdir(folderPath);
+            return Promise.all(
+                filenames.map(async (filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    const fileType = (await fsAsync.stat(filePath)).isDirectory() ? 'dir' : 'file';
+                    try {
+                        return new FileInfo(filePath, fileType);
+                    } catch (err) {
+                        // silently ignore permissions errors
                     }
-                    const fileResults = [];
-
-                    items.forEach((item) => {
-                        try {
-                            fileResults.push(new FileInfo(path.join(folderPath, item)));
-                        } catch (err) {
-                            // silently ignore permissions errors
-                        }
-                    });
-
-                    resolve(fileResults);
-                });
-            });
+                }),
+            );
         });
-
-        return Promise.all(results).then((allResults) => {
-            return allResults.reduce((all: string[], currentResults: string[]) => {
-                return all.concat(currentResults);
-            }, []);
-        });
+        const fileInfosArray = await Promise.all(getFileInfoPromises);
+        return fileInfosArray.flat();
     }
 
     /**
@@ -211,64 +215,67 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * the current line.
      *
      */
-    getFoldersPath(fileName: string, currentLine: string, currentPosition: number): string[] {
+    async getFoldersPath(
+        fileName: string,
+        currentLine: string,
+        currentPosition: number,
+    ): Promise<string[]> {
         const userPath = this.getUserPath(currentLine, currentPosition);
         const mappingResult = this.applyMapping(userPath);
+        const promises = mappingResult.items
+            .map((item) => {
+                const insertedPath = item.insertedPath;
+                const currentDir =
+                    item.currentDir || this.getCurrentDirectory(fileName, insertedPath);
 
-        return (
-            mappingResult.items
-                .map((item) => {
-                    const insertedPath = item.insertedPath;
-                    const currentDir =
-                        item.currentDir || this.getCurrentDirectory(fileName, insertedPath);
-
-                    // relative to the disk
-                    if (insertedPath.match(/^[a-z]:/i)) {
-                        let resolved = path.resolve(insertedPath);
-                        // restore trailing slashes if they were removed
-                        if (resolved.slice(-1) != insertedPath.slice(-1)) {
-                            resolved += insertedPath.substr(-1);
-                        }
-                        return [resolved];
+                // relative to the disk
+                if (insertedPath.match(/^[a-z]:/i)) {
+                    let resolved = path.resolve(insertedPath);
+                    // restore trailing slashes if they were removed
+                    if (resolved.slice(-1) != insertedPath.slice(-1)) {
+                        resolved += insertedPath.slice(-1);
                     }
+                    return [resolved];
+                }
 
-                    // user folder
-                    if (insertedPath.startsWith('~')) {
-                        return [
-                            path.join(configuration.data.homeDirectory, insertedPath.substring(1)),
-                        ];
-                    }
+                // user folder
+                if (insertedPath.startsWith('~')) {
+                    return [path.join(configuration.data.homeDirectory, insertedPath.substring(1))];
+                }
 
-                    // npm package
-                    if (this.isNodePackage(insertedPath, currentLine)) {
-                        return [
-                            path.join(this.getNodeModulesPath(currentDir), insertedPath),
-                            path.join(currentDir, insertedPath),
-                        ];
-                    }
+                return [path.join(currentDir, insertedPath)];
+            })
+            // merge the resulted path
+            .flat()
+            // keep only folders
+            .map(async (folderPath) => {
+                const item = {
+                    folderPath,
+                    valid: true,
+                };
 
-                    return [path.join(currentDir, insertedPath)];
-                })
-                // merge the resulted path
-                .reduce((flat, toFlatten) => {
-                    return flat.concat(toFlatten);
-                }, [])
-                // keep only folders
-                .map((folderPath: string) => {
-                    if (folderPath.endsWith('/') || folderPath.endsWith('\\')) {
-                        return folderPath;
-                    }
-                    return path.dirname(folderPath);
-                })
-                // keep only valid paths
-                .filter((folderPath) => {
-                    if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
-                        return false;
-                    }
+                if (!(folderPath.endsWith('/') || folderPath.endsWith('\\'))) {
+                    item.folderPath = path.dirname(folderPath);
+                }
 
-                    return true;
-                })
-        );
+                if (
+                    !(await pathExists(folderPath)) ||
+                    !(await fsAsync.lstat(folderPath)).isDirectory()
+                ) {
+                    item.valid = false;
+                }
+
+                return item;
+            });
+
+        const items = await Promise.all(promises);
+        const foldersPath = [];
+        for (const item of items) {
+            if (item.valid) {
+                foldersPath.push(item.folderPath);
+            }
+        }
+        return foldersPath;
     }
 
     /**
@@ -309,26 +316,6 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     }
 
     /**
-     * Searches for the node_modules folder in the parent folders of the current directory.
-     *
-     * @param currentDir The current directory
-     */
-    getNodeModulesPath(currentDir: string): string {
-        const rootPath = configuration.data.workspaceFolderPath;
-
-        while (currentDir != path.dirname(currentDir)) {
-            const candidatePath = path.join(currentDir, 'node_modules');
-            if (fs.existsSync(candidatePath)) {
-                return candidatePath;
-            }
-
-            currentDir = path.dirname(currentDir);
-        }
-
-        return path.join(rootPath, 'node_modules');
-    }
-
-    /**
      * Returns the current working directory
      */
     getCurrentDirectory(fileName: string, insertedPath: string): string {
@@ -346,7 +333,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     /**
      * Applies the folder mappings based on the user configurations
      */
-    applyMapping(insertedPath: string): { items } {
+    applyMapping(insertedPath: string): { items: MappingItem[] } {
         const currentDir = '';
         const workspaceFolderPath = configuration.data.workspaceFolderPath;
         const workspaceRootPath = configuration.data.workspaceRootPath;
@@ -417,21 +404,6 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             });
         }
         return { items };
-    }
-
-    /**
-     * Determine if the current path matches the pattern for a node module
-     */
-    isNodePackage(insertedPath: string, currentLine: string) {
-        if (!currentLine.match(/require|import/)) {
-            return false;
-        }
-
-        if (!insertedPath.match(/^[a-z]/i)) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -533,36 +505,31 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         const currentFile = this.currentFile;
         const currentLine = this.currentLine;
-        let valid = true;
 
-        Object.keys(configuration.data.excludedItems).forEach(function (item) {
-            const exclusion = configuration.data.excludedItems[item];
-
+        return Object.entries(configuration.data.excludedItems).every(([item, exclusion]) => {
             // check the local file name pattern
             if (!minimatch(currentFile, exclusion.when)) {
-                return;
+                return true;
             }
 
             if (!minimatch(suggestionFile.getPath(), item)) {
-                return;
+                return true;
             }
 
             // check the local line context
             if (exclusion.context) {
                 const contextRegex = new RegExp(exclusion.context);
                 if (!contextRegex.test(currentLine)) {
-                    return;
+                    return true;
                 }
             }
 
             // exclude folders from the results
             if (exclusion.isDir && !suggestionFile.isDirectory()) {
-                return;
+                return true;
             }
 
-            valid = false;
+            return false;
         });
-
-        return valid;
     }
 }

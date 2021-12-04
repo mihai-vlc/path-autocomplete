@@ -1,8 +1,10 @@
 import path from 'path';
 import fs from 'fs';
 
+type FileType = 'dir' | 'file';
+
 export class FileInfo {
-    private type: string;
+    private type: FileType;
     private name: string;
     private itemPath: string;
 
@@ -11,9 +13,9 @@ export class FileInfo {
      *
      * @throws Error if the path is invalid or you don't have permissions to it
      */
-    constructor(itemPath: string) {
+    constructor(itemPath: string, type?: FileType) {
         this.itemPath = itemPath;
-        this.type = fs.statSync(itemPath).isDirectory() ? 'dir' : 'file';
+        this.type = type ?? (fs.statSync(itemPath).isDirectory() ? 'dir' : 'file');
         this.name = path.basename(itemPath);
     }
 

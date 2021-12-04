@@ -3,15 +3,13 @@ import vs from 'vscode';
 interface PathConfigurationValues {
     withExtension?: boolean;
     withExtensionOnImport?: boolean;
-    excludedItems?: [
-        {
-            [key: string]: {
-                when: string;
-                isDir?: boolean;
-                context?: string;
-            };
-        },
-    ];
+    excludedItems?: {
+        [key: string]: {
+            when: string;
+            isDir?: boolean;
+            context?: string;
+        };
+    };
     pathMappings?: [
         {
             [key: string]: string;
