@@ -7,25 +7,23 @@ import PathConfiguration from './PathConfiguration';
 import fs from 'fs';
 import path from 'path';
 
-var configuration = new PathConfiguration();
+const configuration = new PathConfiguration();
 
 // load the initial configurations
 configuration.update();
 
 export class PathAutocomplete implements vs.CompletionItemProvider {
-    currentFile: string;
-    currentLine: string;
-    currentPosition: number;
-    insideString: boolean;
-    namePrefix: string;
+    private currentFile: string;
+    private currentLine: string;
+    private currentPosition: number;
+    private namePrefix: string;
 
     provideCompletionItems(
         document: vs.TextDocument,
         position: vs.Position,
-        token: vs.CancellationToken,
+        _token: vs.CancellationToken,
     ): Thenable<vs.CompletionItem[]> {
-        var currentLine = document.getText(document.lineAt(position).range);
-        var self = this;
+        const currentLine = document.getText(document.lineAt(position).range);
 
         configuration.update(document.uri);
 
@@ -38,16 +36,16 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return Promise.resolve([]);
         }
 
-        var foldersPath = this.getFoldersPath(document.fileName, currentLine, position.character);
+        const foldersPath = this.getFoldersPath(document.fileName, currentLine, position.character);
 
         if (foldersPath.length == 0) {
             return Promise.resolve([]);
         }
 
-        var folderItems = this.getFolderItems(foldersPath).then((items: FileInfo[]) => {
+        const folderItems = this.getFolderItems(foldersPath).then((items: FileInfo[]) => {
             // build the list of the completion items
-            var result = items.filter(self.filter, self).map((file) => {
-                var completion = new vs.CompletionItem(file.getName());
+            const result = items.filter(this.filter, this).map((file) => {
+                const completion = new vs.CompletionItem(file.getName());
 
                 completion.insertText = this.getInsertText(file);
 
@@ -60,7 +58,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     }
 
                     if (configuration.data.enableFolderTrailingSlash) {
-                        var commandText = '/';
+                        let commandText = '/';
 
                         if (configuration.data.useBackslash) {
                             commandText = this.isInsideQuotes() ? '\\\\' : '\\';
@@ -114,7 +112,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      *      /folder/subfo
      */
     getNamePrefix(): string {
-        var userPath = this.getUserPath(this.currentLine, this.currentPosition);
+        const userPath = this.getUserPath(this.currentLine, this.currentPosition);
         if (userPath.endsWith('/') || userPath.endsWith('\\')) {
             return '';
         }
@@ -135,7 +133,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     }
 
     getInsertText(file: FileInfo): string {
-        var insertText = '';
+        let insertText = '';
 
         if (this.isExtensionEnabled() || file.isDirectory()) {
             insertText = path.basename(file.getName());
@@ -153,13 +151,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         // apply the transformations
         configuration.data.transformations.forEach((transform) => {
-            var fileNameRegex =
+            const fileNameRegex =
                 transform.when && transform.when.fileName && new RegExp(transform.when.fileName);
             if (fileNameRegex && !file.getName().match(fileNameRegex)) {
                 return;
             }
 
-            var parameters = transform.parameters || [];
+            const parameters = transform.parameters || [];
             if (transform.type == 'replace' && parameters[0]) {
                 insertText = String.prototype.replace.call(
                     insertText,
@@ -180,13 +178,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Builds a list of the available files and folders from the provided path.
      */
     getFolderItems(foldersPath: string[]) {
-        var results = foldersPath.map((folderPath) => {
+        const results = foldersPath.map((folderPath) => {
             return new Promise(function (resolve, reject) {
                 fs.readdir(folderPath, function (err, items) {
                     if (err) {
                         return reject(err);
                     }
-                    var fileResults = [];
+                    const fileResults = [];
 
                     items.forEach((item) => {
                         try {
@@ -214,19 +212,19 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      *
      */
     getFoldersPath(fileName: string, currentLine: string, currentPosition: number): string[] {
-        var userPath = this.getUserPath(currentLine, currentPosition);
-        var mappingResult = this.applyMapping(userPath);
+        const userPath = this.getUserPath(currentLine, currentPosition);
+        const mappingResult = this.applyMapping(userPath);
 
         return (
             mappingResult.items
                 .map((item) => {
-                    var insertedPath = item.insertedPath;
-                    var currentDir =
+                    const insertedPath = item.insertedPath;
+                    const currentDir =
                         item.currentDir || this.getCurrentDirectory(fileName, insertedPath);
 
                     // relative to the disk
                     if (insertedPath.match(/^[a-z]:/i)) {
-                        var resolved = path.resolve(insertedPath);
+                        let resolved = path.resolve(insertedPath);
                         // restore trailing slashes if they were removed
                         if (resolved.slice(-1) != insertedPath.slice(-1)) {
                             resolved += insertedPath.substr(-1);
@@ -280,12 +278,12 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * @param currentPosition The current position of the cursor.
      */
     getUserPath(currentLine: string, currentPosition: number): string {
-        var lastQuote = -1;
-        var lastSeparator = -1;
-        var pathSepartors = configuration.data.pathSeparators.split('');
+        let lastQuote = -1;
+        let lastSeparator = -1;
+        const pathSepartors = configuration.data.pathSeparators.split('');
 
-        for (var i = 0; i < currentPosition; i++) {
-            var c = currentLine[i];
+        for (let i = 0; i < currentPosition; i++) {
+            const c = currentLine[i];
 
             // skip next character if escaped
             if (c == '\\') {
@@ -305,7 +303,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             }
         }
 
-        var startPosition = lastQuote != -1 ? lastQuote : lastSeparator;
+        const startPosition = lastQuote != -1 ? lastQuote : lastSeparator;
 
         return currentLine.substring(startPosition + 1, currentPosition);
     }
@@ -316,10 +314,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * @param currentDir The current directory
      */
     getNodeModulesPath(currentDir: string): string {
-        var rootPath = configuration.data.workspaceFolderPath;
+        const rootPath = configuration.data.workspaceFolderPath;
 
         while (currentDir != path.dirname(currentDir)) {
-            var candidatePath = path.join(currentDir, 'node_modules');
+            const candidatePath = path.join(currentDir, 'node_modules');
             if (fs.existsSync(candidatePath)) {
                 return candidatePath;
             }
@@ -334,8 +332,8 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Returns the current working directory
      */
     getCurrentDirectory(fileName: string, insertedPath: string): string {
-        var currentDir = path.parse(fileName).dir || '/';
-        var workspacePath = configuration.data.workspaceFolderPath;
+        let currentDir = path.parse(fileName).dir || '/';
+        const workspacePath = configuration.data.workspaceFolderPath;
 
         // based on the project root
         if (insertedPath.startsWith('/') && workspacePath) {
@@ -349,10 +347,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Applies the folder mappings based on the user configurations
      */
     applyMapping(insertedPath: string): { items } {
-        var currentDir = '';
-        var workspaceFolderPath = configuration.data.workspaceFolderPath;
-        var workspaceRootPath = configuration.data.workspaceRootPath;
-        var items = [];
+        const currentDir = '';
+        const workspaceFolderPath = configuration.data.workspaceFolderPath;
+        const workspaceRootPath = configuration.data.workspaceRootPath;
+        const items = [];
 
         Object.keys(configuration.data.pathMappings || {})
             // if insertedPath is '@view/'
@@ -365,7 +363,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 return f2 - f1;
             })
             .map((key) => {
-                var candidatePaths = configuration.data.pathMappings[key];
+                let candidatePaths = configuration.data.pathMappings[key];
 
                 if (typeof candidatePaths == 'string') {
                     candidatePaths = [candidatePaths];
@@ -392,7 +390,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 });
             })
             .some((mappings) => {
-                var found = false;
+                let found = false;
 
                 mappings.forEach((mapping) => {
                     if (
@@ -462,21 +460,21 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Determines if the prefix of the path is in the ignored list
      */
     isIgnoredPrefix() {
-        var igoredPrefixes = configuration.data.ignoredPrefixes;
+        const igoredPrefixes = configuration.data.ignoredPrefixes;
 
         if (!igoredPrefixes || igoredPrefixes.length == 0) {
             return false;
         }
 
         return igoredPrefixes.some((prefix) => {
-            var currentLine = this.currentLine;
-            var position = this.currentPosition;
+            const currentLine = this.currentLine;
+            const position = this.currentPosition;
 
             if (prefix.length > currentLine.length) {
                 return false;
             }
 
-            var candidate = currentLine.substring(position - prefix.length, position);
+            const candidate = currentLine.substring(position - prefix.length, position);
 
             if (prefix == candidate) {
                 return true;
@@ -490,16 +488,16 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Determines if the cursor is inside quotes.
      */
     isInsideQuotes(): boolean {
-        var currentLine = this.currentLine;
-        var position = this.currentPosition;
-        var quotes = {
+        const currentLine = this.currentLine;
+        const position = this.currentPosition;
+        const quotes = {
             single: 0,
             double: 0,
             backtick: 0,
         };
 
         // check if we are inside quotes
-        for (var i = 0; i < position; i++) {
+        for (let i = 0; i < position; i++) {
             if (currentLine.charAt(i) == "'" && currentLine.charAt(i - 1) != '\\') {
                 quotes.single += quotes.single > 0 ? -1 : 1;
             }
@@ -533,12 +531,12 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return false;
         }
 
-        var currentFile = this.currentFile;
-        var currentLine = this.currentLine;
-        var valid = true;
+        const currentFile = this.currentFile;
+        const currentLine = this.currentLine;
+        let valid = true;
 
         Object.keys(configuration.data.excludedItems).forEach(function (item) {
-            var exclusion = configuration.data.excludedItems[item];
+            const exclusion = configuration.data.excludedItems[item];
 
             // check the local file name pattern
             if (!minimatch(currentFile, exclusion.when)) {
@@ -551,7 +549,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
             // check the local line context
             if (exclusion.context) {
-                var contextRegex = new RegExp(exclusion.context);
+                const contextRegex = new RegExp(exclusion.context);
                 if (!contextRegex.test(currentLine)) {
                     return;
                 }

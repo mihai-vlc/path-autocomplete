@@ -46,7 +46,10 @@ export default class PathConfiguration {
     }
 
     update(fileUri?: vs.Uri) {
-        var codeConfiguration = vs.workspace.getConfiguration('path-autocomplete', fileUri || null);
+        const codeConfiguration = vs.workspace.getConfiguration(
+            'path-autocomplete',
+            fileUri || null,
+        );
 
         this.data.withExtension = codeConfiguration.get('includeExtension');
         this.data.withExtensionOnImport = codeConfiguration.get('extensionOnImport');
@@ -62,10 +65,10 @@ export default class PathConfiguration {
         this.data.ignoredPrefixes = codeConfiguration.get('ignoredPrefixes');
         this.data.homeDirectory = process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'];
 
-        var workspaceRootFolder = vs.workspace.workspaceFolders
+        const workspaceRootFolder = vs.workspace.workspaceFolders
             ? vs.workspace.workspaceFolders[0]
             : null;
-        var workspaceFolder = workspaceRootFolder;
+        let workspaceFolder = workspaceRootFolder;
 
         if (fileUri) {
             workspaceFolder = vs.workspace.getWorkspaceFolder(fileUri);

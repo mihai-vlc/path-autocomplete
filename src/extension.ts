@@ -2,7 +2,7 @@ import vscode from 'vscode';
 import { PathAutocomplete } from './features/PathAutocompleteProvider';
 
 export function activate(context: vscode.ExtensionContext) {
-    var selector: vscode.DocumentSelector = [
+    const selector: vscode.DocumentSelector = [
         {
             pattern: '**',
         },
@@ -18,4 +18,4 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+// export function deactivate() {}
