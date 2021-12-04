@@ -1,16 +1,22 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es6",
-        "outDir": "out",
-        "lib": [
-            "es6"
-        ],
-        "sourceMap": true,
-        "rootDir": "."
-    },
-    "exclude": [
-        "node_modules",
-        ".vscode-test"
-    ]
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2021",
+    "outDir": "out",
+    "sourceMap": true,
+    "rootDir": ".",
+    
+    /* Module Resolution Options */
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+
+    /* Experimental Options */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    /* Advanced Options */
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  }
 }
