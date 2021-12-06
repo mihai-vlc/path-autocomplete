@@ -54,7 +54,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             position.character,
         );
 
-        if (foldersPath.length == 0) {
+        if (foldersPath.length === 0) {
             return [];
         }
 
@@ -62,12 +62,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         // build the list of the completion items
         const result = folderItems.filter(this.filter, this).map((file) => {
-            const completion = new vs.CompletionItem(file.getName());
-
+            const completion = new vs.CompletionItem(file.name);
+            
+            completion.detail = file.path;
             completion.insertText = this.getInsertText(file);
 
             // show folders before files
-            if (file.isDirectory()) {
+            if (file.isDirectory) {
                 if (configuration.data.useBackslash) {
                     completion.label += '\\';
                 } else {
@@ -149,16 +150,16 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     getInsertText(file: FileInfo): string {
         let insertText = '';
 
-        if (this.isExtensionEnabled() || file.isDirectory()) {
-            insertText = path.basename(file.getName());
+        if (this.isExtensionEnabled() || file.isDirectory) {
+            insertText = path.basename(file.name);
         } else {
             // remove the extension
-            insertText = path.basename(file.getName(), path.extname(file.getName()));
+            insertText = path.basename(file.name, path.extname(file.name));
         }
 
         if (configuration.data.useBackslash && this.isInsideQuotes()) {
             // determine if we should insert an additional backslash
-            if (this.currentLine[this.currentPosition - 2] != '\\') {
+            if (this.currentLine[this.currentPosition - 2] !== '\\') {
                 insertText = '\\' + insertText;
             }
         }
@@ -167,12 +168,12 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         configuration.data.transformations.forEach((transform) => {
             const fileNameRegex =
                 transform.when && transform.when.fileName && new RegExp(transform.when.fileName);
-            if (fileNameRegex && !file.getName().match(fileNameRegex)) {
+            if (fileNameRegex && !file.name.match(fileNameRegex)) {
                 return;
             }
 
             const parameters = transform.parameters || [];
-            if (transform.type == 'replace' && parameters[0]) {
+            if (transform.type === 'replace' && parameters[0]) {
                 insertText = String.prototype.replace.call(
                     insertText,
                     new RegExp(parameters[0]),
@@ -232,7 +233,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 if (insertedPath.match(/^[a-z]:/i)) {
                     let resolved = path.resolve(insertedPath);
                     // restore trailing slashes if they were removed
-                    if (resolved.slice(-1) != insertedPath.slice(-1)) {
+                    if (resolved.slice(-1) !== insertedPath.slice(-1)) {
                         resolved += insertedPath.slice(-1);
                     }
                     return [resolved];
@@ -293,7 +294,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             const c = currentLine[i];
 
             // skip next character if escaped
-            if (c == '\\') {
+            if (c === '\\') {
                 i++;
                 continue;
             }
@@ -305,12 +306,12 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             }
 
             // handle quotes
-            if (c == "'" || c == '"' || c == '`') {
+            if (c === "'" || c === '"' || c === '`') {
                 lastQuote = i;
             }
         }
 
-        const startPosition = lastQuote != -1 ? lastQuote : lastSeparator;
+        const startPosition = lastQuote !== -1 ? lastQuote : lastSeparator;
 
         return currentLine.substring(startPosition + 1, currentPosition);
     }
@@ -434,7 +435,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     isIgnoredPrefix() {
         const ignoredPrefixes = configuration.data.ignoredPrefixes;
 
-        if (!ignoredPrefixes || ignoredPrefixes.length == 0) {
+        if (!ignoredPrefixes || ignoredPrefixes.length === 0) {
             return false;
         }
 
@@ -448,7 +449,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
             const candidate = currentLine.substring(position - prefix.length, position);
 
-            if (prefix == candidate) {
+            if (prefix === candidate) {
                 return true;
             }
 
@@ -470,15 +471,15 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         // check if we are inside quotes
         for (let i = 0; i < position; i++) {
-            if (currentLine.charAt(i) == "'" && currentLine.charAt(i - 1) != '\\') {
+            if (currentLine.charAt(i) === "'" && currentLine.charAt(i - 1) !== '\\') {
                 quotes.single += quotes.single > 0 ? -1 : 1;
             }
 
-            if (currentLine.charAt(i) == '"' && currentLine.charAt(i - 1) != '\\') {
+            if (currentLine.charAt(i) === '"' && currentLine.charAt(i - 1) !== '\\') {
                 quotes.double += quotes.double > 0 ? -1 : 1;
             }
 
-            if (currentLine.charAt(i) == '`' && currentLine.charAt(i - 1) != '\\') {
+            if (currentLine.charAt(i) === '`' && currentLine.charAt(i - 1) !== '\\') {
                 quotes.backtick += quotes.backtick > 0 ? -1 : 1;
             }
         }
@@ -499,7 +500,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         }
 
         // keep only the records that match the name prefix inserted by the user
-        if (this.namePrefix && suggestionFile.getName().indexOf(this.namePrefix) != 0) {
+        if (this.namePrefix && suggestionFile.name.indexOf(this.namePrefix) !== 0) {
             return false;
         }
 
@@ -512,7 +513,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 return true;
             }
 
-            if (!minimatch(suggestionFile.getPath(), item)) {
+            if (!minimatch(suggestionFile.path, item)) {
                 return true;
             }
 
@@ -525,7 +526,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             }
 
             // exclude folders from the results
-            if (exclusion.isDir && !suggestionFile.isDirectory()) {
+            if (exclusion.isDir && !suggestionFile.isDirectory) {
                 return true;
             }
 

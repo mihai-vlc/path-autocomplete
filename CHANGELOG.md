@@ -1,5 +1,9 @@
 # Path Autocomplete Change Log
 
+#### 1.19.0
+
+- fix https://github.com/ionutvmi/path-autocomplete/issues/100
+
 #### 1.18.0
 
 - remove node packages intellisense because VSCode has builtin support

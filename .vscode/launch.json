@@ -11,6 +11,7 @@
             "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": ["${workspaceRoot}/out/**/*.js"],
+            "skipFiles": ["<node_internals>/**", "**/node_modules/**", "**/resources/app/out/vs/**"],
             "preLaunchTask": "npm: watch"
         }
     ]

@@ -61,7 +61,7 @@ export default class PathConfiguration {
         this.data.enableFolderTrailingSlash = codeConfiguration.get('enableFolderTrailingSlash');
         this.data.ignoredFilesPattern = codeConfiguration.get('ignoredFilesPattern');
         this.data.ignoredPrefixes = codeConfiguration.get('ignoredPrefixes');
-        this.data.homeDirectory = process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'];
+        this.data.homeDirectory = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 
         const workspaceRootFolder = vs.workspace.workspaceFolders
             ? vs.workspace.workspaceFolders[0]
