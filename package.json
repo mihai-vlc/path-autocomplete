@@ -2,21 +2,16 @@
     "name": "path-autocomplete",
     "displayName": "Path Autocomplete",
     "description": "Provides path completion for visual studio code.",
-    "version": "1.19.0",
-    "publisher": "YuTengjing",
+    "version": "1.17.0",
+    "publisher": "ionutvmi",
     "icon": "icon.png",
     "repository": {
         "type": "git",
-        "url": "https://github.com/tjx666/path-autocomplete"
+        "url": "https://github.com/ionutvmi/path-autocomplete"
     },
     "bugs": {
-        "url": "https://github.com/tjx666/path-autocomplete/issues",
-        "email": "ytj2713151713@gmail.com"
-    },
-    "author": {
-        "name": "YuTengjing",
-        "url": "https://github.com/tjx666",
-        "email": "ytj2713151713@gmail.com"
+        "url": "https://github.com/ionutvmi/path-autocomplete/issues",
+        "email": "ionutvmi@gmail.com"
     },
     "engines": {
         "vscode": "^1.62.0"

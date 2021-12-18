@@ -1,14 +1,5 @@
 # Path Autocomplete Change Log
 
-#### 1.19.0
-
-- fix https://github.com/ionutvmi/path-autocomplete/issues/100
-
-#### 1.18.0
-
-- remove node packages intellisense because VSCode has builtin support
-- replace all fs sync operation with async to speed up
-
 #### 1.17.0
 
 Adds support for partial paths.
