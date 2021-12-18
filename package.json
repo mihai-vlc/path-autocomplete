@@ -33,7 +33,9 @@
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./"
+        "watch": "tsc -watch -p ./",
+        "type-check": "tsc -p ./tsconfig.json --noEmit",
+        "lint": "eslint -c .eslintrc.js --ext .ts"
     },
     "dependencies": {
         "minimatch": "3.0.4"
