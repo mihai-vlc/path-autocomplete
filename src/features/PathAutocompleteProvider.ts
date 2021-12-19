@@ -17,9 +17,9 @@ const configuration = new PathConfiguration();
 // load the initial configurations
 configuration.update();
 
-function pathExists(path: string) {
+function pathExists(localPath: string) {
     return fsAsync
-        .access(path, fs.constants.F_OK)
+        .access(localPath, fs.constants.F_OK)
         .then(() => true)
         .catch(() => false);
 }
@@ -63,7 +63,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         // build the list of the completion items
         const result = folderItems.filter(this.filter, this).map((file) => {
             const completion = new vs.CompletionItem(file.name);
-            
+
             completion.detail = file.path;
             completion.insertText = this.getInsertText(file);
 
@@ -183,7 +183,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         });
 
         if (this.namePrefix) {
-            insertText = insertText.substr(this.namePrefix.length);
+            insertText = insertText.substring(this.namePrefix.length);
         }
 
         return insertText;
@@ -198,17 +198,22 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return Promise.all(
                 filenames.map(async (filename) => {
                     const filePath = path.join(folderPath, filename);
-                    const fileType = (await fsAsync.stat(filePath)).isDirectory() ? 'dir' : 'file';
                     try {
+                        const fileType = (await fsAsync.stat(filePath)).isDirectory() ? 'dir' : 'file';
                         return new FileInfo(filePath, fileType);
                     } catch (err) {
                         // silently ignore permissions errors
+                        console.error("error: ", err);
                     }
                 }),
             );
         });
         const fileInfosArray = await Promise.all(getFileInfoPromises);
-        return fileInfosArray.flat();
+        return fileInfosArray.flat().filter(record => {
+            // in case of a file permission error we need to keep only valid 
+            // FileInfo objects in the result
+            return Boolean(record);
+        });
     }
 
     /**
@@ -231,12 +236,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
                 // relative to the disk
                 if (insertedPath.match(/^[a-z]:/i)) {
-                    let resolved = path.resolve(insertedPath);
-                    // restore trailing slashes if they were removed
-                    if (resolved.slice(-1) !== insertedPath.slice(-1)) {
-                        resolved += insertedPath.slice(-1);
-                    }
-                    return [resolved];
+                    return [insertedPath];
                 }
 
                 // user folder
