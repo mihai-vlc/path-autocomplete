@@ -1,32 +1,25 @@
-import * as path from 'path';
-import * as fs from 'fs';
+import { basename } from 'path';
+import fs from 'fs';
+
+type FileType = 'dir' | 'file';
 
 export class FileInfo {
-    private type: string;
-    private name: string;
-    private itemPath: string;
+    private type: FileType;
+    name: string;
+    path: string;
 
     /**
      * Extracts the needed information about the provider file path.
-     * 
+     *
      * @throws Error if the path is invalid or you don't have permissions to it
      */
-    constructor(itemPath:string) {
-
-        this.itemPath = itemPath;
-        this.type = fs.statSync(itemPath).isDirectory() ? 'dir' : 'file';
-        this.name = path.basename(itemPath);
+    constructor(path: string, type?: FileType) {
+        this.name = basename(path);
+        this.path = path;
+        this.type = type ?? (fs.statSync(path).isDirectory() ? 'dir' : 'file');
     }
 
-    isDirectory(): boolean {
-        return this.type == 'dir';
-    }
-
-    getPath() {
-        return this.itemPath;
-    }
-
-    getName() {
-        return this.name;
+    get isDirectory() {
+        return this.type === 'dir';
     }
 }

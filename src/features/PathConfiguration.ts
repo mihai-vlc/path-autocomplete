@@ -1,35 +1,39 @@
-import * as vs from 'vscode';
+import vs from 'vscode';
 
 interface PathConfigurationValues {
-    withExtension?: boolean,
-    withExtensionOnImport?: boolean,
-    excludedItems?: [{
+    withExtension?: boolean;
+    withExtensionOnImport?: boolean;
+    excludedItems?: {
         [key: string]: {
-            when: string,
-            isDir?: boolean,
-            context?: string
-        }
-    }],
-    pathMappings?: [{
-        [key: string]: string
-    }],
-    transformations?: [{
-        type: string,
-        parameters?: Array<any>,
-        when?: {
-            fileName?: string
-        }
-    }],
-    triggerOutsideStrings?: boolean,
-    disableUpOneFolder?: boolean,
-    enableFolderTrailingSlash?: boolean,
-    pathSeparators?: string
-    homeDirectory?: string,
-    workspaceFolderPath?: string,
-    workspaceRootPath?: string,
-    useBackslash?: boolean,
-    ignoredFilesPattern?: string,
-    ignoredPrefixes?: Array<string>
+            when: string;
+            isDir?: boolean;
+            context?: string;
+        };
+    };
+    pathMappings?: [
+        {
+            [key: string]: string;
+        },
+    ];
+    transformations?: [
+        {
+            type: string;
+            parameters?: Array<any>;
+            when?: {
+                fileName?: string;
+            };
+        },
+    ];
+    triggerOutsideStrings?: boolean;
+    disableUpOneFolder?: boolean;
+    enableFolderTrailingSlash?: boolean;
+    pathSeparators?: string;
+    homeDirectory?: string;
+    workspaceFolderPath?: string;
+    workspaceRootPath?: string;
+    useBackslash?: boolean;
+    ignoredFilesPattern?: string;
+    ignoredPrefixes?: Array<string>;
 }
 
 export default class PathConfiguration {
@@ -40,7 +44,10 @@ export default class PathConfiguration {
     }
 
     update(fileUri?: vs.Uri) {
-        var codeConfiguration = vs.workspace.getConfiguration('path-autocomplete', fileUri || null);
+        const codeConfiguration = vs.workspace.getConfiguration(
+            'path-autocomplete',
+            fileUri || null,
+        );
 
         this.data.withExtension = codeConfiguration.get('includeExtension');
         this.data.withExtensionOnImport = codeConfiguration.get('extensionOnImport');
@@ -54,10 +61,12 @@ export default class PathConfiguration {
         this.data.enableFolderTrailingSlash = codeConfiguration.get('enableFolderTrailingSlash');
         this.data.ignoredFilesPattern = codeConfiguration.get('ignoredFilesPattern');
         this.data.ignoredPrefixes = codeConfiguration.get('ignoredPrefixes');
-        this.data.homeDirectory = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+        this.data.homeDirectory = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 
-        var workspaceRootFolder = vs.workspace.workspaceFolders ? vs.workspace.workspaceFolders[0] : null;
-        var workspaceFolder = workspaceRootFolder;
+        const workspaceRootFolder = vs.workspace.workspaceFolders
+            ? vs.workspace.workspaceFolders[0]
+            : null;
+        let workspaceFolder = workspaceRootFolder;
 
         if (fileUri) {
             workspaceFolder = vs.workspace.getWorkspaceFolder(fileUri);
@@ -67,4 +76,3 @@ export default class PathConfiguration {
         this.data.workspaceRootPath = workspaceRootFolder && workspaceRootFolder.uri.fsPath;
     }
 }
-
