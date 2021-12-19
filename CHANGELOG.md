@@ -1,5 +1,12 @@
 # Path Autocomplete Change Log
 
+#### 1.18.0
+1. integrate some useful front end tools: eslint, prettier
+2. optimize dotfiles, settings.json, launch.json
+3. fix #100
+4. remove npm package suggestion because VSCode has builtin support
+5. code style and performance optimizations
+
 #### 1.17.0
 
 Adds support for partial paths.
