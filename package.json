@@ -1,124 +1,133 @@
 {
-  "name": "path-autocomplete",
-  "displayName": "Path Autocomplete",
-  "description": "Provides path completion for visual studio code.",
-  "version": "1.17.0",
-  "publisher": "ionutvmi",
-  "icon": "icon.png",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ionutvmi/path-autocomplete"
-  },
-  "bugs": {
-    "url": "https://github.com/ionutvmi/path-autocomplete/issues",
-    "email": "ionutvmi@gmail.com"
-  },
-  "engines": {
-    "vscode": "^1.19.0"
-  },
-  "keywords": ["multi-root ready"],
-  "categories": [
-    "Other"
-  ],
-  "contributes": {
-    "configuration": {
-      "type": "object",
-      "title": "path-autocomplete",
-      "properties": {
-        "path-autocomplete.extensionOnImport": {
-          "type": "boolean",
-          "default": false,
-          "description": "Adds the extension when inserting file on import or require statements.",
-          "scope": "resource"
-        },
-        "path-autocomplete.includeExtension": {
-          "type": "boolean",
-          "default": true,
-          "description": "Adds the extension when inserting file names.",
-          "scope": "resource"
-        },
-        "path-autocomplete.excludedItems": {
-          "type": "object",
-          "default": {},
-          "description": "Allows you to exclude certain files from the suggestions.",
-          "scope": "resource"
-        },
-        "path-autocomplete.pathMappings": {
-          "type": "object",
-          "default": {},
-          "description": "Defines custom mappings for the autocomplete paths.",
-          "scope": "resource"
-        },
-        "path-autocomplete.pathSeparators": {
-          "type": "string",
-          "default": " \t({[",
-          "description": "Defines the separators for support outside string.",
-          "scope": "resource"
-        },
-        "path-autocomplete.transformations": {
-          "type": "array",
-          "default": [],
-          "description": "Custom transformations applied to the inserted text.",
-          "scope": "resource"
-        },
-        "path-autocomplete.triggerOutsideStrings": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enables path autocompletion outside strings.",
-          "scope": "resource"
-        },
-        "path-autocomplete.disableUpOneFolder": {
-          "type": "boolean",
-          "default": true,
-          "description": "Disabled the .. option in the recommendations.",
-          "scope": "resource"
-        },
-        "path-autocomplete.useBackslash": {
-          "type": "boolean",
-          "default": false,
-          "description": "If enabled it will use backslash (\\) as a path separator.",
-          "scope": "resource"
-        },
-        "path-autocomplete.enableFolderTrailingSlash": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enables the trailing slash on the folder path insertion.",
-          "scope": "resource"
-        },
-        "path-autocomplete.ignoredFilesPattern": {
-          "type": "string",
-          "default": "",
-          "description": "Glob patterns for disabling the path completion in the specified file types.",
-          "scope": "resource"
-        },
-        "path-autocomplete.ignoredPrefixes": {
-          "type": "array",
-          "default": [],
-          "description": "List of prefixes for which completions will be skipped.",
-          "scope": "resource"
+    "name": "path-autocomplete",
+    "displayName": "Path Autocomplete",
+    "description": "Provides path completion for visual studio code.",
+    "version": "1.17.0",
+    "publisher": "ionutvmi",
+    "icon": "icon.png",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ionutvmi/path-autocomplete"
+    },
+    "bugs": {
+        "url": "https://github.com/ionutvmi/path-autocomplete/issues",
+        "email": "ionutvmi@gmail.com"
+    },
+    "engines": {
+        "vscode": "^1.62.0"
+    },
+    "keywords": [
+        "path",
+        "suggestion",
+        "autocomplete",
+        "intellisense",
+        "alias"
+    ],
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./out/src/extension",
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "type-check": "tsc -p ./tsconfig.json --noEmit",
+        "lint": "eslint -c .eslintrc.js --ext .ts"
+    },
+    "dependencies": {
+        "minimatch": "3.0.4"
+    },
+    "devDependencies": {
+        "@types/minimatch": "^3.0.5",
+        "@types/node": "^17.0.0",
+        "@types/vscode": "^1.62.0",
+        "@typescript-eslint/eslint-plugin": "^5.7.0",
+        "@typescript-eslint/parser": "^5.7.0",
+        "eslint": "^8.5.0",
+        "eslint-config-prettier": "^8.3.0",
+        "typescript": "^4.5.4"
+    },
+    "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "path-autocomplete",
+            "properties": {
+                "path-autocomplete.extensionOnImport": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Adds the extension when inserting file on import or require statements.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.includeExtension": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Adds the extension when inserting file names.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.excludedItems": {
+                    "type": "object",
+                    "default": {},
+                    "description": "Allows you to exclude certain files from the suggestions.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.pathMappings": {
+                    "type": "object",
+                    "default": {},
+                    "description": "Defines custom mappings for the autocomplete paths.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.pathSeparators": {
+                    "type": "string",
+                    "default": " \t({[",
+                    "description": "Defines the separators for support outside string.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.transformations": {
+                    "type": "array",
+                    "default": [],
+                    "description": "Custom transformations applied to the inserted text.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.triggerOutsideStrings": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables path autocompletion outside strings.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.disableUpOneFolder": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Disabled the .. option in the recommendations.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.useBackslash": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled it will use backslash (\\) as a path separator.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.enableFolderTrailingSlash": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables the trailing slash on the folder path insertion.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.ignoredFilesPattern": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Glob patterns for disabling the path completion in the specified file types.",
+                    "scope": "resource"
+                },
+                "path-autocomplete.ignoredPrefixes": {
+                    "type": "array",
+                    "default": [],
+                    "description": "List of prefixes for which completions will be skipped.",
+                    "scope": "resource"
+                }
+            }
         }
-      }
     }
-  },
-  "activationEvents": [
-    "*"
-  ],
-  "main": "./out/src/extension",
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "npm run compile && node ./node_modules/vscode/bin/test"
-  },
-  "devDependencies": {
-    "typescript": "^2.6.1",
-    "vscode": "^1.1.6",
-    "@types/node": "^7.0.43",
-    "@types/mocha": "^2.2.42",
-    "mocha": "3.5.0"
-  },
-  "dependencies": {
-    "minimatch": "3.0.3"
-  }
 }
