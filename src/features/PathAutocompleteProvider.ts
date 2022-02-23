@@ -24,6 +24,19 @@ function pathExists(localPath: string) {
         .catch(() => false);
 }
 
+// using original-fs rather than fs to deal with .asar file
+// ref: https://github.com/microsoft/vscode/issues/143393#issuecomment-1047518447
+const originalFs = require('original-fs') as typeof fs;
+async function isDirectory(filePath: string): Promise<boolean> {
+    const ext = path.extname(filePath);
+    return new Promise((resolve, reject) => {
+        originalFs.stat(filePath, (err, statInfo) => {
+            if (err) reject(err);
+            resolve(statInfo.isDirectory());
+        });
+    });
+}
+
 export class PathAutocomplete implements vs.CompletionItemProvider {
     private currentFile: string;
     private currentLine: string;
@@ -199,18 +212,18 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 filenames.map(async (filename) => {
                     const filePath = path.join(folderPath, filename);
                     try {
-                        const fileType = (await fsAsync.stat(filePath)).isDirectory() ? 'dir' : 'file';
+                        const fileType = (await isDirectory(filePath)) ? 'dir' : 'file';
                         return new FileInfo(filePath, fileType);
                     } catch (err) {
                         // silently ignore permissions errors
-                        console.error("error: ", err);
+                        console.error('error: ', err);
                     }
                 }),
             );
         });
         const fileInfosArray = await Promise.all(getFileInfoPromises);
-        return fileInfosArray.flat().filter(record => {
-            // in case of a file permission error we need to keep only valid 
+        return fileInfosArray.flat().filter((record) => {
+            // in case of a file permission error we need to keep only valid
             // FileInfo objects in the result
             return Boolean(record);
         });
@@ -259,10 +272,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     item.folderPath = path.dirname(folderPath);
                 }
 
-                if (
-                    !(await pathExists(folderPath)) ||
-                    !(await fsAsync.lstat(folderPath)).isDirectory()
-                ) {
+                if (!(await pathExists(folderPath)) || !(await isDirectory(folderPath))) {
                     item.valid = false;
                 }
 

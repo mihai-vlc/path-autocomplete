@@ -17,6 +17,7 @@ module.exports = {
     rules: {
         '@typescript-eslint/no-unused-vars': OFF,
         '@typescript-eslint/no-explicit-any': OFF,
+        '@typescript-eslint/no-var-requires': OFF,
 
         'no-empty': OFF,
 
