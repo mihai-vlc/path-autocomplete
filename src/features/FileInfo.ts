@@ -1,7 +1,7 @@
 import { basename } from 'path';
 import fs from 'fs';
 
-type FileType = 'dir' | 'file';
+export type FileType = 'dir' | 'file';
 
 export class FileInfo {
     private type: FileType;
