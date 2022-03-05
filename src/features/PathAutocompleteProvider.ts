@@ -1,4 +1,3 @@
-import fs from 'fs';
 import fsAsync from 'fs/promises';
 import path from 'path';
 
@@ -6,36 +5,14 @@ import vs from 'vscode';
 import minimatch from 'minimatch';
 import { FileInfo } from './FileInfo';
 import PathConfiguration from './PathConfiguration';
+import { isDirectory, pathExists } from './FsUtils';
 
 interface MappingItem {
     currentDir: string;
     insertedPath: string;
 }
 
-const configuration = new PathConfiguration();
-
-// load the initial configurations
-configuration.update();
-
-function pathExists(localPath: string) {
-    return fsAsync
-        .access(localPath, fs.constants.F_OK)
-        .then(() => true)
-        .catch(() => false);
-}
-
-// using original-fs rather than fs to deal with .asar file
-// ref: https://github.com/microsoft/vscode/issues/143393#issuecomment-1047518447
-const originalFs = require('original-fs') as typeof fs;
-async function isDirectory(filePath: string): Promise<boolean> {
-    const ext = path.extname(filePath);
-    return new Promise((resolve, reject) => {
-        originalFs.stat(filePath, (err, statInfo) => {
-            if (err) reject(err);
-            resolve(statInfo.isDirectory());
-        });
-    });
-}
+const configuration = PathConfiguration.configuration;
 
 export class PathAutocomplete implements vs.CompletionItemProvider {
     private currentFile: string;
@@ -48,11 +25,10 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         position: vs.Position,
         _token: vs.CancellationToken,
     ): Promise<vs.CompletionItem[]> {
-        const currentLine = document.getText(document.lineAt(position).range);
-
         configuration.update(document.uri);
 
         this.currentFile = document.fileName;
+        const currentLine = document.getText(document.lineAt(position).range);
         this.currentLine = currentLine;
         this.currentPosition = position.character;
         this.namePrefix = this.getNamePrefix();
@@ -77,6 +53,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         const result = folderItems.filter(this.filter, this).map((file) => {
             const completion = new vs.CompletionItem(file.name);
 
+            // correct suggestion Item icon, ref issue#100
             completion.detail = file.path;
             completion.insertText = this.getInsertText(file);
 
@@ -136,8 +113,8 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * This is used when the path that the user typed so far
      * contains part of the file/folder name
      * Examples:
-     *      /folder/Fi => complete path is /folder/File
-     *      /folder/subfo => complete path is /folder/subfolder
+     *      /folder/Fi => complete path is /folder/File => will return Fi
+     *      /folder/subfo => complete path is /folder/subfolder => will return subfo
      */
     getNamePrefix(): string {
         const userPath = this.getUserPath(this.currentLine, this.currentPosition);
@@ -216,7 +193,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                         return new FileInfo(filePath, fileType);
                     } catch (err) {
                         // silently ignore permissions errors
-                        console.error('error: ', err);
+                        console.error(err);
                     }
                 }),
             );
