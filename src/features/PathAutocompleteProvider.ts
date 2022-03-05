@@ -51,11 +51,12 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         // build the list of the completion items
         const result = folderItems.filter(this.filter, this).map((file) => {
-            const completion = new vs.CompletionItem(file.name);
+            const insertText = this.getInsertText(file);
+            const completion = new vs.CompletionItem(insertText);
 
             // correct suggestion Item icon, ref issue#100
             completion.detail = file.path;
-            completion.insertText = this.getInsertText(file);
+            completion.insertText = insertText;
 
             // show folders before files
             if (file.isDirectory) {
@@ -141,7 +142,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         let insertText = '';
 
         if (this.isExtensionEnabled() || file.isDirectory) {
-            insertText = path.basename(file.name);
+            insertText = file.name;
         } else {
             // remove the extension
             insertText = path.basename(file.name, path.extname(file.name));
