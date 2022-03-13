@@ -1,5 +1,8 @@
 # Path Autocomplete Change Log
 
+#### 1.19.1
+- Fixes the extension loading on remote ssh #108
+
 #### 1.19.0
 - Updates the completion label to be consistent with insertText
 - Fix: asar file is recogonized as directory
