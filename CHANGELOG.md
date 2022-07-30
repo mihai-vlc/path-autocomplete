@@ -1,14 +1,21 @@
 # Path Autocomplete Change Log
 
 #### 1.19.1
+
+- Adds support for VS Code for Web
+
+#### 1.19.1
+
 - Fixes the extension loading on remote ssh #108
 
 #### 1.19.0
+
 - Updates the completion label to be consistent with insertText
 - Fix: asar file is recogonized as directory
 - Upgrade dependencies
 
 #### 1.18.0
+
 1. integrate some useful front end tools: eslint, prettier
 2. optimize dotfiles, settings.json, launch.json
 3. fix #100

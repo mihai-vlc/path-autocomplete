@@ -17,6 +17,7 @@ Provides path completion for visual studio code.
 - it supports custom mappings via the `path-autocomplete.pathMappings` option
 - it supports custom transformations to the inserted text via the `path-autocomplete.transformations`
 - it supports windows paths with the `path-autocomplete.useBackslash`
+- it supports VS Code for Web
 
 ## Installation
 

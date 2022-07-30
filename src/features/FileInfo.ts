@@ -1,6 +1,4 @@
 import { basename } from 'path';
-import fs from 'fs';
-
 export type FileType = 'dir' | 'file';
 
 export class FileInfo {
@@ -13,10 +11,10 @@ export class FileInfo {
      *
      * @throws Error if the path is invalid or you don't have permissions to it
      */
-    constructor(path: string, type?: FileType) {
+    constructor(path: string, type: FileType) {
         this.name = basename(path);
         this.path = path;
-        this.type = type ?? (fs.statSync(path).isDirectory() ? 'dir' : 'file');
+        this.type = type;
     }
 
     get isDirectory() {

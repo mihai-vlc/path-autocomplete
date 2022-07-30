@@ -1,38 +1,23 @@
-import fs from 'fs';
-import fsAsync from 'fs/promises';
+import vs from 'vscode';
 
-export function pathExists(localPath: string) {
-    return fsAsync
-        .access(localPath, fs.constants.F_OK)
-        .then(() => true)
-        .catch(() => false);
+export async function pathExists(localPath: string): Promise<boolean> {
+    try {
+        await vs.workspace.fs.stat(vs.Uri.file(localPath));
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
-
-const originalFs = getFsModule();
 
 export async function isDirectory(filePath: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-        originalFs.stat(filePath, (err, statInfo) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            resolve(statInfo.isDirectory());
-        });
-    });
+    try {
+        const stat = await vs.workspace.fs.stat(vs.Uri.file(filePath));
+        return stat.type === vs.FileType.Directory;
+    } catch (e) {
+        return false;
+    }
 }
 
-function getFsModule() {
-    try {
-        // throws an error if module is not found (remote ssh environment)
-        require.resolve("original-fs");
-
-        // using original-fs rather than fs to deal with .asar file
-        // ref: https://github.com/microsoft/vscode/issues/143393#issuecomment-1047518447
-        return require('original-fs') as typeof fs;
-    } catch (e) {
-        console.log("original-fs not found, falling back to the default fs module");
-        return fs;
-    }
+export async function readDirectory(filePath: string) {
+    return vs.workspace.fs.readDirectory(vs.Uri.file(filePath));
 }

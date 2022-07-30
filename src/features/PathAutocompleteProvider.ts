@@ -1,11 +1,10 @@
-import fsAsync from 'fs/promises';
 import path from 'path';
 
 import vs from 'vscode';
 import minimatch from 'minimatch';
 import { FileInfo } from './FileInfo';
 import PathConfiguration from './PathConfiguration';
-import { isDirectory, pathExists } from './FsUtils';
+import { isDirectory, pathExists, readDirectory } from './FsUtils';
 
 interface MappingItem {
     currentDir: string;
@@ -185,13 +184,13 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      */
     async getFolderItems(foldersPath: string[]): Promise<FileInfo[]> {
         const getFileInfoPromises = foldersPath.map(async (folderPath) => {
-            const filenames = await fsAsync.readdir(folderPath);
+            const fileTuples = await readDirectory(folderPath);
             return Promise.all(
-                filenames.map(async (filename) => {
-                    const filePath = path.join(folderPath, filename);
+                fileTuples.map(async (fileTuple) => {
+                    const filePath = path.join(folderPath, fileTuple[0]);
                     try {
-                        const fileType = (await isDirectory(filePath)) ? 'dir' : 'file';
-                        return new FileInfo(filePath, fileType);
+                        const isDir = fileTuple[1] === vs.FileType.Directory;
+                        return new FileInfo(filePath, isDir ? 'dir' : 'file');
                     } catch (err) {
                         // silently ignore permissions errors
                         console.error(err);
