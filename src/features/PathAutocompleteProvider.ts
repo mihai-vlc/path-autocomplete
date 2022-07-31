@@ -5,6 +5,7 @@ import minimatch from 'minimatch';
 import { FileInfo } from './FileInfo';
 import PathConfiguration from './PathConfiguration';
 import { isDirectory, pathExists, readDirectory } from './FsUtils';
+import { normalizeForBrowser } from './Normalize';
 
 interface MappingItem {
     currentDir: string;
@@ -26,7 +27,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     ): Promise<vs.CompletionItem[]> {
         configuration.update(document.uri);
 
-        this.currentFile = document.fileName;
+        this.currentFile = normalizeForBrowser(document.fileName);
         const currentLine = document.getText(document.lineAt(position).range);
         this.currentLine = currentLine;
         this.currentPosition = position.character;
@@ -37,7 +38,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         }
 
         const foldersPath = await this.getFoldersPath(
-            document.fileName,
+            this.currentFile,
             currentLine,
             position.character,
         );

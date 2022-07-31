@@ -26,6 +26,7 @@ module.exports = /** @type WebpackConfig */ {
         fallback: {
             assert: require.resolve('assert'),
             path: require.resolve('path-browserify'),
+            os: require.resolve('os-browserify/browser'),
         },
     },
     module: {

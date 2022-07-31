@@ -1,6 +1,10 @@
 # Path Autocomplete Change Log
 
-#### 1.19.1
+#### 1.20.1
+
+- Normalizes the path when using the VS Code for Web from Windows
+
+#### 1.20.0
 
 - Adds support for VS Code for Web
 
