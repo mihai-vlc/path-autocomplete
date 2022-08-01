@@ -2,7 +2,7 @@
     "name": "path-autocomplete",
     "displayName": "Path Autocomplete",
     "description": "Provides path completion for visual studio code and VS Code for Web.",
-    "version": "1.20.1",
+    "version": "1.20.2",
     "publisher": "ionutvmi",
     "icon": "icon.png",
     "repository": {
@@ -41,7 +41,8 @@
         "watch-web": "webpack --watch --config ./build/web-extension.webpack.config.js"
     },
     "dependencies": {
-        "minimatch": "5.0.1"
+        "minimatch": "5.0.1",
+        "normalize-path": "3.0.0"
     },
     "devDependencies": {
         "@types/minimatch": "3.0.5",
@@ -51,7 +52,6 @@
         "@typescript-eslint/parser": "5.31.0",
         "eslint": "8.20.0",
         "eslint-config-prettier": "8.5.0",
-        "normalize-path": "3.0.0",
         "os-browserify": "0.3.0",
         "path-browserify": "1.0.1",
         "prettier": "2.5.1",
