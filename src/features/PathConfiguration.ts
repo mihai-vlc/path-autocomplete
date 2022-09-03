@@ -32,6 +32,7 @@ interface PathConfigurationValues {
     workspaceFolderPath?: string;
     workspaceRootPath?: string;
     useBackslash?: boolean;
+    useSingleBackslash?: boolean;
     ignoredFilesPattern?: string;
     ignoredPrefixes?: Array<string>;
 }
@@ -61,6 +62,7 @@ export default class PathConfiguration {
         this.data.triggerOutsideStrings = codeConfiguration.get('triggerOutsideStrings');
         this.data.disableUpOneFolder = codeConfiguration.get('disableUpOneFolder');
         this.data.useBackslash = codeConfiguration.get('useBackslash');
+        this.data.useSingleBackslash = codeConfiguration.get('useSingleBackslash');
         this.data.enableFolderTrailingSlash = codeConfiguration.get('enableFolderTrailingSlash');
         this.data.ignoredFilesPattern = codeConfiguration.get('ignoredFilesPattern');
         this.data.ignoredPrefixes = codeConfiguration.get('ignoredPrefixes');

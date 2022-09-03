@@ -72,7 +72,11 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                     let commandText = '/';
 
                     if (useBackslash) {
-                        commandText = this.isInsideQuotes() ? '\\\\' : '\\';
+                        if (this.shouldUseSingleBackslash()) {
+                            commandText = '\\';
+                        } else {
+                            commandText = this.isInsideQuotes() ? '\\\\' : '\\';
+                        }
                     }
 
                     completion.command = {
@@ -132,6 +136,32 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
     }
 
     /**
+     * Determines if a single backslash should be used in the current string
+     */
+    shouldUseSingleBackslash() {
+        if (configuration.data.useSingleBackslash) {
+            return true;
+        }
+
+        // attempt to detect raw strings that don't need double backslash
+        //  example: r"C:\work"
+        if (this.isInsideQuotes()) {
+            const currentLine = this.currentLine;
+            const position = this.currentPosition;
+
+            for (let i = position; i > 0; i--) {
+                const c = currentLine[i];
+                const isQuote = c === '"' || c === "'" || c === '`';
+                if (i > 0 && isQuote && currentLine[i - 1] === 'r') {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    /**
      * Gets the name prefix for the completion item.
      * This is used when the path that the user typed so far
      * contains part of the file/folder name
@@ -170,7 +200,11 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             insertText = path.basename(file.name, path.extname(file.name));
         }
 
-        if (this.shouldUseBackslash() && this.isInsideQuotes()) {
+        if (
+            this.shouldUseBackslash() &&
+            this.isInsideQuotes() &&
+            !this.shouldUseSingleBackslash()
+        ) {
             // determine if we should insert an additional backslash
             if (this.currentLine[this.currentPosition - 2] !== '\\') {
                 insertText = '\\' + insertText;

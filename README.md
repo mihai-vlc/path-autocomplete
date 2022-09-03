@@ -84,6 +84,7 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 - `path-autocomplete.enableFolderTrailingSlash` boolean - if true it will add a slash after the insertion of a folder path that will trigger the autocompletion.
 - `path-autocomplete.disableUpOneFolder` boolean - disables the up one folder (..) element from the completion list.
 - `path-autocomplete.useBackslash` boolean - if true it will use `\\` when iserting the paths.
+- `path-autocomplete.useSingleBackslash` boolean - If enabled it will insert a single backslash (\\) even inside quoted strings.
 - `path-autocomplete.ignoredFilesPattern` - string - Glob patterns for disabling the path completion in the specified file types. Example: "\*_/_.{css,scss}"
 - `path-autocomplete.ignoredPrefixes` array - list of ignored prefixes to disable suggestions
   on certain preceeding words/characters.

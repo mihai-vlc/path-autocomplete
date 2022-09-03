@@ -120,6 +120,12 @@
                     "description": "If enabled it will use backslash (\\) as a path separator.",
                     "scope": "resource"
                 },
+                "path-autocomplete.useSingleBackslash": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If enabled it will insert a single backslash (\\) even inside quoted strings",
+                    "scope": "resource"
+                },
                 "path-autocomplete.enableFolderTrailingSlash": {
                     "type": "boolean",
                     "default": true,
