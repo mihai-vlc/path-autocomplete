@@ -1,5 +1,11 @@
 # Path Autocomplete Change Log
 
+#### 1.21.0
+
+- Adds support for the `useSingleBackslash` preference. Fixes #57
+- Implements the auto detection of the `useBackslash` flag, fixes #112
+- Updates the activation events to use `onStartupFinished`, fixes #114
+
 #### 1.20.1
 
 - Normalizes the path when using the VS Code for Web from Windows
