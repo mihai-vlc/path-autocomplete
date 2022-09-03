@@ -37,6 +37,8 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return [];
         }
 
+        const useBackslash = this.shouldUseBackslash();
+
         const foldersPath = await this.getFoldersPath(
             this.currentFile,
             currentLine,
@@ -60,7 +62,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
             // show folders before files
             if (file.isDirectory) {
-                if (configuration.data.useBackslash) {
+                if (useBackslash) {
                     completion.label += '\\';
                 } else {
                     completion.label += '/';
@@ -69,7 +71,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 if (configuration.data.enableFolderTrailingSlash) {
                     let commandText = '/';
 
-                    if (configuration.data.useBackslash) {
+                    if (useBackslash) {
                         commandText = this.isInsideQuotes() ? '\\\\' : '\\';
                     }
 
@@ -107,6 +109,26 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         }
 
         return result;
+    }
+
+    /**
+     * Determines if the current completion item should use backshash or forward slash.
+     */
+    shouldUseBackslash(): boolean {
+        if (configuration.data.useBackslash) {
+            return true;
+        }
+
+        const userPath = this.getUserPath(this.currentLine, this.currentPosition);
+        const pathParts = userPath.split(/\\|\//);
+        const backslashParts = userPath.split('\\');
+
+        // check if backslash is the path separator for the current path
+        if (userPath.indexOf('\\') > -1 && pathParts.length === backslashParts.length) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -148,7 +170,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             insertText = path.basename(file.name, path.extname(file.name));
         }
 
-        if (configuration.data.useBackslash && this.isInsideQuotes()) {
+        if (this.shouldUseBackslash() && this.isInsideQuotes()) {
             // determine if we should insert an additional backslash
             if (this.currentLine[this.currentPosition - 2] !== '\\') {
                 insertText = '\\' + insertText;
