@@ -297,16 +297,19 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             .flat()
             // keep only folders
             .map(async (folderPath) => {
+                if (!folderPath.endsWith('/') && !folderPath.endsWith('\\')) {
+                    const isDirPath = await isDirectory(folderPath);
+                    if (!isDirPath) {
+                        folderPath = path.dirname(folderPath);
+                    }
+                }
+
                 const item = {
                     folderPath,
                     valid: true,
                 };
 
-                if (!(folderPath.endsWith('/') || folderPath.endsWith('\\'))) {
-                    item.folderPath = path.dirname(folderPath);
-                }
-
-                if (!(await pathExists(folderPath)) || !(await isDirectory(folderPath))) {
+                if (!(await pathExists(item.folderPath)) || !(await isDirectory(item.folderPath))) {
                     item.valid = false;
                 }
 
