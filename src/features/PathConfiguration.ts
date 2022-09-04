@@ -52,10 +52,7 @@ export default class PathConfiguration {
     }
 
     update(fileUri?: vs.Uri) {
-        const codeConfiguration = vs.workspace.getConfiguration(
-            'path-autocomplete',
-            fileUri || null,
-        );
+        const codeConfiguration = vs.workspace.getConfiguration('path-autocomplete', fileUri || null);
 
         this.data.withExtension = codeConfiguration.get('includeExtension');
         this.data.withExtensionOnImport = codeConfiguration.get('extensionOnImport');
@@ -70,8 +67,7 @@ export default class PathConfiguration {
         this.data.enableFolderTrailingSlash = codeConfiguration.get('enableFolderTrailingSlash');
         this.data.ignoredFilesPattern = codeConfiguration.get('ignoredFilesPattern');
         this.data.ignoredPrefixes = codeConfiguration.get('ignoredPrefixes');
-        this.data.homeDirectory =
-            process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
+        this.data.homeDirectory = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 
         const workspaceRootFolder = vs.workspace.workspaceFolders
             ? vs.workspace.workspaceFolders[0]
@@ -80,11 +76,9 @@ export default class PathConfiguration {
 
         if (fileUri) {
             workspaceFolder = vs.workspace.getWorkspaceFolder(fileUri);
-            this.data.fileDirname = path.dirname(fileUri.fsPath);
-            this.data.relativeFileDirname = path.relative(
-                fileUri.fsPath,
-                workspaceFolder.uri.fsPath,
-            );
+            const dirName = path.dirname(fileUri.fsPath);
+            this.data.fileDirname = dirName;
+            this.data.relativeFileDirname = path.relative(workspaceFolder.uri.fsPath, dirName) || '.';
         }
 
         this.data.workspaceFolderPath = workspaceFolder && workspaceFolder.uri.fsPath;

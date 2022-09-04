@@ -201,6 +201,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         }
 
         if (
+            !this.namePrefix &&
             this.shouldUseBackslash() &&
             this.isInsideQuotes() &&
             !this.shouldUseSingleBackslash()

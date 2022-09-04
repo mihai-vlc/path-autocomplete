@@ -63,7 +63,7 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
   | ${folder} | The root folder of the current file |
   | ${workspace} | The root folder of the current workspace |
   | ${fileDirname} | The directory of the current file |
-  | ${relativeFileDirname} | The directory of the current file |
+  | ${relativeFileDirname} | The current opened file's dirname relative to workspaceFolder |
 
 - `path-autocomplete.pathSeparators` - string Lists the separators used for extracting the inserted path when used outside strings.
   The default value is: ` \t({[`
