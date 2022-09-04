@@ -78,7 +78,11 @@ export default class PathConfiguration {
             workspaceFolder = vs.workspace.getWorkspaceFolder(fileUri);
             const dirName = path.dirname(fileUri.fsPath);
             this.data.fileDirname = dirName;
-            this.data.relativeFileDirname = path.relative(workspaceFolder.uri.fsPath, dirName) || '.';
+
+            if (workspaceFolder) {
+                this.data.relativeFileDirname =
+                    path.relative(workspaceFolder.uri.fsPath, dirName) || '.';
+            }
         }
 
         this.data.workspaceFolderPath = workspaceFolder && workspaceFolder.uri.fsPath;
