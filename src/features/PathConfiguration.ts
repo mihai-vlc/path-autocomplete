@@ -1,4 +1,6 @@
 import vs from 'vscode';
+import * as process from '../util/process';
+import * as path from '../util/path';
 
 interface PathConfigurationValues {
     withExtension?: boolean;
@@ -35,6 +37,8 @@ interface PathConfigurationValues {
     useSingleBackslash?: boolean;
     ignoredFilesPattern?: string;
     ignoredPrefixes?: Array<string>;
+    fileDirname?: string;
+    relativeFileDirname?: string;
 }
 
 export default class PathConfiguration {
@@ -76,6 +80,11 @@ export default class PathConfiguration {
 
         if (fileUri) {
             workspaceFolder = vs.workspace.getWorkspaceFolder(fileUri);
+            this.data.fileDirname = path.dirname(fileUri.fsPath);
+            this.data.relativeFileDirname = path.relative(
+                fileUri.fsPath,
+                workspaceFolder.uri.fsPath,
+            );
         }
 
         this.data.workspaceFolderPath = workspaceFolder && workspaceFolder.uri.fsPath;

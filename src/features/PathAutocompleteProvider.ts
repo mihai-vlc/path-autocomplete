@@ -1,11 +1,11 @@
-import path from 'path';
-
 import vs from 'vscode';
 import minimatch from 'minimatch';
 import { FileInfo } from './FileInfo';
 import PathConfiguration from './PathConfiguration';
 import { isDirectory, pathExists, readDirectory } from './FsUtils';
 import { normalizeForBrowser } from './Normalize';
+
+import * as path from '../util/path';
 
 interface MappingItem {
     currentDir: string;
@@ -382,7 +382,6 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      * Applies the folder mappings based on the user configurations
      */
     applyMapping(insertedPath: string): { items: MappingItem[] } {
-        const currentDir = '';
         const workspaceFolderPath = configuration.data.workspaceFolderPath;
         const workspaceRootPath = configuration.data.workspaceRootPath;
         const items = [];
@@ -417,6 +416,20 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                         '${home}',
                         configuration.data.homeDirectory,
                     );
+
+                    if (configuration.data.fileDirname) {
+                        candidatePath = candidatePath.replace(
+                            '${fileDirname}',
+                            configuration.data.fileDirname,
+                        );
+                    }
+
+                    if (configuration.data.relativeFileDirname) {
+                        candidatePath = candidatePath.replace(
+                            '${relativeFileDirname}',
+                            configuration.data.relativeFileDirname,
+                        );
+                    }
 
                     return {
                         key: key,

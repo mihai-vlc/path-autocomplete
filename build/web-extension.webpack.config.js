@@ -25,7 +25,6 @@ module.exports = /** @type WebpackConfig */ {
         alias: {},
         fallback: {
             assert: require.resolve('assert'),
-            path: require.resolve('path-browserify'),
             os: require.resolve('os-browserify/browser'),
         },
     },
@@ -42,11 +41,7 @@ module.exports = /** @type WebpackConfig */ {
             },
         ],
     },
-    plugins: [
-        new webpack.ProvidePlugin({
-            process: 'process/browser',
-        }),
-    ],
+    plugins: [],
     externals: {
         vscode: 'commonjs vscode', // ignored because it doesn't exist
     },

@@ -1,4 +1,4 @@
-import { basename } from 'path';
+import { basename } from '../util/path';
 export type FileType = 'dir' | 'file';
 
 export class FileInfo {

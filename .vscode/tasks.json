@@ -24,6 +24,12 @@
             "problemMatcher": [
                 "$ts-webpack-watch"
             ]
+        },
+        {
+            "label": "My Task",
+            "type": "shell",
+            "command": "echo ${relativeFileDirname}",
+            "problemMatcher": []
         }
     ]
 }
