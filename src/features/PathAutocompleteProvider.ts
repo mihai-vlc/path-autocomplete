@@ -39,11 +39,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
 
         const useBackslash = this.shouldUseBackslash();
 
-        const foldersPath = await this.getFoldersPath(
-            this.currentFile,
-            currentLine,
-            position.character,
-        );
+        const foldersPath = await this.getFoldersPath(this.currentFile, currentLine, position.character);
 
         if (foldersPath.length === 0) {
             return [];
@@ -279,8 +275,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         const promises = mappingResult.items
             .map((item) => {
                 const insertedPath = item.insertedPath;
-                const currentDir =
-                    item.currentDir || this.getCurrentDirectory(fileName, insertedPath);
+                const currentDir = item.currentDir || this.getCurrentDirectory(fileName, insertedPath);
 
                 // relative to the disk
                 if (insertedPath.match(/^[a-z]:/i)) {
@@ -413,10 +408,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                         candidatePath = candidatePath.replace('${folder}', workspaceFolderPath);
                     }
 
-                    candidatePath = candidatePath.replace(
-                        '${home}',
-                        configuration.data.homeDirectory,
-                    );
+                    candidatePath = candidatePath.replace('${home}', configuration.data.homeDirectory);
 
                     if (configuration.data.fileDirname) {
                         candidatePath = candidatePath.replace(
@@ -553,10 +545,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
      */
     filter(suggestionFile: FileInfo) {
         // no options configured
-        if (
-            !configuration.data.excludedItems ||
-            typeof configuration.data.excludedItems != 'object'
-        ) {
+        if (!configuration.data.excludedItems || typeof configuration.data.excludedItems != 'object') {
             return true;
         }
 

@@ -1,5 +1,11 @@
 # Path Autocomplete Change Log
 
+#### 1.22.0
+
+- Removes the need for the trailing slash in the path mappings folders. Fixes #111
+- Removes dependency on the native path and process node modules
+- Adds support for the relativeFileDirname variable in the path mappings. Fixes #94
+
 #### 1.21.0
 
 - Adds support for the `useSingleBackslash` preference. Fixes #57
