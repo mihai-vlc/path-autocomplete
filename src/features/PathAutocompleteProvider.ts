@@ -25,7 +25,7 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         position: vs.Position,
         _token: vs.CancellationToken,
     ): Promise<vs.CompletionItem[]> {
-        configuration.update(document.uri);
+        configuration.update(document.uri, document.languageId);
 
         this.currentFile = normalizeForBrowser(document.fileName);
         const currentLine = document.getText(document.lineAt(position).range);

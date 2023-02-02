@@ -1,4 +1,10 @@
+
 # Path Autocomplete Change Log
+
+#### 1.23.0
+
+- Adds support for language specific configurations. Fixes #123
+
 
 #### 1.22.0
 
@@ -176,3 +182,4 @@ inserting the path outside strings.
 #### 1.0.2
 
 - Initial release
+

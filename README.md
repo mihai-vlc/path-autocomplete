@@ -18,6 +18,7 @@ Provides path completion for visual studio code.
 - it supports custom transformations to the inserted text via the `path-autocomplete.transformations`
 - it supports Windows paths with the `path-autocomplete.useBackslash`
 - it supports VS Code for Web (including on Windows)
+- it supports language specific configurations
 
 ## Installation
 
@@ -104,6 +105,17 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
       ]
   ```
 -
+
+## Language specific configurations
+
+All settings can be overwritten by language specific configurations.
+
+```jsonc
+    "path-autocomplete.extensionOnImport": false,
+    "[typescript]": {
+        "path-autocomplete.extensionOnImport": false,
+    },
+```
 
 ## Configure VSCode to recognize path aliases
 

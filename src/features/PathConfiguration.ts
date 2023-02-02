@@ -51,8 +51,11 @@ export default class PathConfiguration {
         this.update();
     }
 
-    update(fileUri?: vs.Uri) {
-        const codeConfiguration = vs.workspace.getConfiguration('path-autocomplete', fileUri || null);
+    update(fileUri?: vs.Uri, languageId?: string) {
+        const codeConfiguration = vs.workspace.getConfiguration('path-autocomplete', {
+            uri: fileUri,
+            languageId: languageId,
+        });
 
         this.data.withExtension = codeConfiguration.get('includeExtension');
         this.data.withExtensionOnImport = codeConfiguration.get('extensionOnImport');
