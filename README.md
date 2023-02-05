@@ -185,8 +185,8 @@ The release notes are available in the [CHANGELOG.md](CHANGELOG.md) file.
 
 Mihai Ionut Vilcu
 
-- [github/ionutvmi](https://github.com/ionutvmi)
-- [twitter/mihaivlc93](http://twitter.com/mihaivlc93)
+- [github/mihai-vlc](https://github.com/mihai-vlc)
+- [twitter/mihai_vlc](http://twitter.com/mihai_vlc)
 
 ## Credits
 
