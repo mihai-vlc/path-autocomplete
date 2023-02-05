@@ -32,7 +32,7 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 - `path-autocomplete.excludedItems`
   This option allows you to exclude certain files from the suggestions.
 
-  ```
+  ```jsonc
   "path-autocomplete.excludedItems": {
       "**/*.js": { "when": "**/*.ts" }, // ignore js files if i'm inside a ts file
       "**/*.map": { "when": "**" }, // always ignore *.map files
@@ -47,7 +47,7 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
 - `path-autocomplete.pathMappings`
   Useful for defining aliases for absolute or relative paths.
 
-  ```
+  ```jsonc
   "path-autocomplete.pathMappings": {
       "/test": "${folder}/src/Actions/test", // alias for /test
       "/": "${folder}/src", // the absolute root folder is now /src,
@@ -73,14 +73,27 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
   List of custom transformation applied to the inserted text.
   Example: replace `_` with an empty string when selecting a SCSS partial file.
 
-  ```
-  "path-autocomplete.transformations": [{
+  ```jsonc
+  "path-autocomplete.transformations": [
+  {
       "type": "replace",
       "parameters": ["^_", ""],
       "when": {
           "fileName": "\\.scss$"
       }
-  }],
+  },
+  // useful if extensionOnImport is true
+  {
+        "type": "replace",
+        "parameters": [
+            "\\.\\w+$",
+            ""
+        ],
+        "when": {
+            "fileName": "\\.(ts|tsx|js|jsx)$"
+        }
+    }
+  ],
   ```
 
   Supported transformation:
@@ -150,7 +163,7 @@ VSCode doesn't automatically recognize path aliases so you cannot <kbd>alt</kbd>
 - if you have issues with duplicate suggestions please use the `path-autocomplete.ignoredFilesPattern` option to disable the path autocomplete in certain file types
 - if you need more fine grained control for handing duplicate items you can use the `path-autocomplete.excludedItems` option as follows:
 
-```
+```jsonc
 // disable all suggestions in HTML files, when the current line contains the href or src attributes
 "path-autocomplete.excludedItems": {
         "**": {
