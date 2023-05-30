@@ -2,8 +2,8 @@
 
 #### 1.24.0
 
-- Adds support for regex modifiers on the replace transformation. Fixes #123
-- Adds support for the `inputReplace` transformation type. Fixes #123
+- Adds support for regex modifiers on the replace transformation. Fixes #118
+- Adds support for the `inputReplace` transformation type. Fixes #118
 
 #### 1.23.0
 
