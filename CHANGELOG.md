@@ -1,10 +1,13 @@
-
 # Path Autocomplete Change Log
+
+#### 1.24.0
+
+- Adds support for regex modifiers on the replace transformation. Fixes #123
+- Adds support for the `inputReplace` transformation type. Fixes #123
 
 #### 1.23.0
 
 - Adds support for language specific configurations. Fixes #123
-
 
 #### 1.22.0
 
@@ -182,4 +185,3 @@ inserting the path outside strings.
 #### 1.0.2
 
 - Initial release
-

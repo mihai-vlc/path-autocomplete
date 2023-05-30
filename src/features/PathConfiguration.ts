@@ -23,6 +23,7 @@ interface PathConfigurationValues {
             parameters?: Array<any>;
             when?: {
                 fileName?: string;
+                path?: string;
             };
         },
     ];

@@ -215,12 +215,16 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             if (fileNameRegex && !file.name.match(fileNameRegex)) {
                 return;
             }
+            const pathRegex = transform.when && transform.when.path && new RegExp(transform.when.path);
+            if (pathRegex && !file.path.match(pathRegex)) {
+                return;
+            }
 
             const parameters = transform.parameters || [];
             if (transform.type === 'replace' && parameters[0]) {
                 insertText = String.prototype.replace.call(
                     insertText,
-                    new RegExp(parameters[0]),
+                    new RegExp(parameters[0], parameters[2]),
                     parameters[1],
                 );
             }
@@ -355,8 +359,26 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
         }
 
         const startPosition = lastQuote !== -1 ? lastQuote : lastSeparator;
+        let userPath = currentLine.substring(startPosition + 1, currentPosition);
 
-        return currentLine.substring(startPosition + 1, currentPosition);
+        // apply the transformations
+        configuration.data.transformations.forEach((transform) => {
+            const pathRegex = transform.when && transform.when.path && new RegExp(transform.when.path);
+            if (pathRegex && !userPath.match(pathRegex)) {
+                return;
+            }
+
+            const parameters = transform.parameters || [];
+            if (transform.type === 'inputReplace' && parameters[0]) {
+                userPath = String.prototype.replace.call(
+                    userPath,
+                    new RegExp(parameters[0], parameters[2]),
+                    parameters[1],
+                );
+            }
+        });
+
+        return userPath;
     }
 
     /**

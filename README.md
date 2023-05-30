@@ -73,22 +73,51 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
   List of custom transformation applied to the inserted text.
   Example: replace `_` with an empty string when selecting a SCSS partial file.
 
-  ```
-  "path-autocomplete.transformations": [{
-      "type": "replace",
-      "parameters": ["^_", ""],
-      "when": {
-          "fileName": "\\.scss$"
-      }
-  }],
+  ```jsonc
+  "path-autocomplete.transformations": [
+    {
+        "type": "replace",
+        "parameters": ["^_", ""],
+        "when": {
+            "fileName": "\\.scss$"
+        }
+    },
+
+    // replace spaces with %20
+    {
+        "type": "replace",
+        "parameters": [ " ", "%20", "g" ],
+        "when": {
+            "path": ".*routes"
+        }
+    },
+
+    // replace %20 with spaces when reading the already inserted path
+    {
+        "type": "inputReplace",
+        "parameters": [ "%20", " ", "g" ],
+        "when": {
+            "path": ".*routes"
+        }
+    }
+  ],
   ```
 
   Supported transformation:
 
-  - `replace` - Performs a string replace on the selected item text.
+  - `replace` - Performs a string replace on the selected item text.  
     Parameters:
+
     - `regex` - a regex pattern
     - `replaceString` - the replacement string
+    - `modifiers` - modifiers passed to the RegExp constructor
+
+  - `inputReplace` - Performs a string replace on the input path.  
+    Parameters:
+
+    - `regex` - a regex pattern
+    - `replaceString` - the replacement string
+    - `modifiers` - modifiers passed to the RegExp constructor
 
 - `path-autocomplete.triggerOutsideStrings` boolean - if true it will trigger the autocomplete outside of quotes
 - `path-autocomplete.enableFolderTrailingSlash` boolean - if true it will add a slash after the insertion of a folder path that will trigger the autocompletion.
