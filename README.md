@@ -131,6 +131,16 @@ You can install it from the [marketplace](https://marketplace.visualstudio.com/i
     - `replaceString` - the replacement string
     - `modifiers` - modifiers passed to the RegExp constructor
 
+  The `fileName` and `path` can be used for filtering the items/instances where the transformation should be applied.
+
+  For the `replace` transformation considering we selected `/home/mihai/a.txt`:
+  - `fileName` - regex applied to the basename of the selected suggestion `a.txt`
+  - `path` - regex applied to the the full path of the selected suggestion `/home/mihai/a.txt`
+
+  For the `inputReplace` transformation considering that what we typed so far is `/home/mihai`:
+  - `path` - regex applied to the path inserted so far `/home/mihai`
+
+
 - `path-autocomplete.triggerOutsideStrings` boolean - if true it will trigger the autocomplete outside of quotes
 - `path-autocomplete.enableFolderTrailingSlash` boolean - if true it will add a slash after the insertion of a folder path that will trigger the autocompletion.
 - `path-autocomplete.disableUpOneFolder` boolean - disables the up one folder (..) element from the completion list.
