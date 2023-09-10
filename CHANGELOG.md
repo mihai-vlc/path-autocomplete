@@ -1,5 +1,26 @@
 # Path Autocomplete Change Log
 
+#### 1.25.0
+
+- Adds support for conditional path mappings
+
+```jsonc
+  "path-autocomplete.pathMappings": {
+    "$root": {
+      "conditions": [
+        {
+          "when": "**/packages/math/**",
+          "value": "${folder}/packages/math"
+        },
+        {
+          "when": "**/packages/ui/**",
+          "value": "${folder}/packages/ui"
+        }
+      ]
+    }
+  },
+```
+
 #### 1.24.0
 
 - Adds support for regex modifiers on the replace transformation. Fixes #118

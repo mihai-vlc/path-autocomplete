@@ -414,8 +414,38 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
                 const f2 = insertedPath.startsWith(key2) ? key2.length : 0;
                 return f2 - f1;
             })
+            .filter((key) => {
+                const candidate = configuration.data.pathMappings[key];
+                if (typeof candidate == 'string' || Array.isArray(candidate)) {
+                    return true;
+                }
+
+                if (typeof candidate == 'object' && Array.isArray(candidate.conditions)) {
+                    /*
+                        "conditions": [
+                            {
+                                "when": "packages/math/**",
+                                "value": "${folder}/packages/math"
+                            }
+                        ]
+                    */
+                    return candidate.conditions.some((condition) => {
+                        return minimatch(this.currentFile, condition.when);
+                    });
+                }
+
+                return false;
+            })
             .map((key) => {
                 let candidatePaths = configuration.data.pathMappings[key];
+
+                // normalize candidate paths
+                if (typeof candidatePaths == 'object' && Array.isArray(candidatePaths.conditions)) {
+                    const matchingCandidate = candidatePaths.conditions.find((condition) =>
+                        minimatch(this.currentFile, condition.when),
+                    );
+                    candidatePaths = matchingCandidate.value;
+                }
 
                 if (typeof candidatePaths == 'string') {
                     candidatePaths = [candidatePaths];

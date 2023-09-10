@@ -2,16 +2,16 @@
     "name": "path-autocomplete",
     "displayName": "Path Autocomplete",
     "description": "Provides path completion for visual studio code and VS Code for Web.",
-    "version": "1.24.1",
+    "version": "1.25.0",
     "publisher": "ionutvmi",
     "icon": "icon.png",
     "repository": {
         "type": "git",
-        "url": "https://github.com/ionutvmi/path-autocomplete"
+        "url": "https://github.com/mihai-vlc/path-autocomplete"
     },
     "bugs": {
-        "url": "https://github.com/ionutvmi/path-autocomplete/issues",
-        "email": "ionutvmi@gmail.com"
+        "url": "https://github.com/mihai-vlc/path-autocomplete/issues",
+        "email": "mihai.vlc11@gmail.com"
     },
     "engines": {
         "vscode": "^1.69.0"
