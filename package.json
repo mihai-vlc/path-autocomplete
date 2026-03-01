@@ -41,7 +41,7 @@
         "watch-web": "webpack --watch --config ./build/web-extension.webpack.config.js"
     },
     "dependencies": {
-        "minimatch": "5.1.7",
+        "minimatch": "5.1.8",
         "normalize-path": "3.0.0"
     },
     "devDependencies": {
