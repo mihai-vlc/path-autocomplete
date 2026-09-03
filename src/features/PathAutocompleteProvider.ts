@@ -37,6 +37,39 @@ export class PathAutocomplete implements vs.CompletionItemProvider {
             return [];
         }
 
+        const userPath = this.getUserPath(currentLine, position.character);
+        const mappings = configuration.data.pathMappings || {};
+
+        // Check if the cursor has not navigated into subfolders and is typing an alias starting with "@"
+        if (!userPath.includes('/') && !userPath.includes('\\') && userPath.startsWith('@')) {
+            const aliasKeys = Object.keys(mappings).filter((k) => k.startsWith('@') && k !== '@');
+            const matched = aliasKeys.filter((k) => k.startsWith(userPath));
+
+            if (matched.length > 0) {
+                return matched.map((alias) => {
+                    const item = new vs.CompletionItem(alias, vs.CompletionItemKind.Folder);
+                    const mappingVal = mappings[alias];
+                    item.detail =
+                        typeof mappingVal === 'string' ? mappingVal : JSON.stringify(mappingVal);
+
+                    // Replace the already typed prefix (e.g. "@" or "@sh")
+                    const startPos = new vs.Position(
+                        position.line,
+                        position.character - userPath.length,
+                    );
+                    item.range = new vs.Range(startPos, position);
+                    item.insertText = alias + '/';
+
+                    // Automatically trigger suggestions for the folder content after selecting the alias
+                    item.command = {
+                        command: 'editor.action.triggerSuggest',
+                        title: 'triggerSuggest',
+                    };
+                    return item;
+                });
+            }
+        }
+
         const useBackslash = this.shouldUseBackslash();
 
         const foldersPath = await this.getFoldersPath(this.currentFile, currentLine, position.character);
