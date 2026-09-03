@@ -1,5 +1,9 @@
 # Path Autocomplete Change Log
 
+#### 1.26.0
+
+- Adds support for suggestion from the path mappings that start with `@`
+
 #### 1.25.0
 
 - Adds support for conditional path mappings
