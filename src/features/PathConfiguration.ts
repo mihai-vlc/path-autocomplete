@@ -12,11 +12,9 @@ interface PathConfigurationValues {
             context?: string;
         };
     };
-    pathMappings?: [
-        {
-            [key: string]: string;
-        },
-    ];
+    pathMappings?: {
+        [key: string]: string | string[] | { conditions: { when: string; value: string }[] };
+    };
     transformations?: [
         {
             type: string;
@@ -55,7 +53,7 @@ export default class PathConfiguration {
     update(fileUri?: vs.Uri, languageId?: string) {
         const codeConfiguration = vs.workspace.getConfiguration('path-autocomplete', {
             uri: fileUri,
-            languageId: languageId,
+            languageId: languageId || '',
         });
 
         this.data.withExtension = codeConfiguration.get('includeExtension');
@@ -75,7 +73,7 @@ export default class PathConfiguration {
 
         const workspaceRootFolder = vs.workspace.workspaceFolders
             ? vs.workspace.workspaceFolders[0]
-            : null;
+            : undefined;
         let workspaceFolder = workspaceRootFolder;
 
         if (fileUri) {
